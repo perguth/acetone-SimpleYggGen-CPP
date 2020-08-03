@@ -365,25 +365,23 @@ static inline void miner(const char * prefix)
 		free(ipv6);
 	}
 }
-int main(int argc, char**argv)
-{
+
+int main(int argc, char**argv){
 	intro();
-	if (argc < 2)
+	if ( argc < 2 )
 	{
 		usage();
 		return 0;
 	}
-	options.outputpath = defaultSearchFileName;
-	parsing(argc, argv); //FIXME
+	options.outputpath=defaultSearchFileName;
+	parsing( argc, argv ); //FIXME
 
 
-	if(options.reg) 
-    	options.regex = std::regex(argv[1]);
-	if(options.threads < 0)
-    	options.threads = std::thread::hardware_concurrency();;
+	if(options.reg) options.regex=std::regex(argv[1]);
+	if ( options.threads < 0 ) options.threads=std::thread::hardware_concurrency();;
 	std::vector<std::thread> threads(options.threads);
 
-	for (unsigned int j = options.threads; --j;)
+	for ( unsigned int j = options.threads;j--;)
 	{
 		//std::cout << "thread " << j << " start" << std::endl;
 		threads[j] = std::thread(static_cast<void(*)(const char*)>(miner), argv[1]);
