@@ -116,7 +116,7 @@ void usage(void)
 	const constexpr char * help=NAMEPROGRAM" [text-pattern|regex-pattern] [options]\n"
 	"-h --help, help menu\n"
 	"-r --reg,  regexp instead just text pattern (e.g. '(one|two).*')\n"
-	"--threads -t, (default count of system)\n"
+	"-t --threads,  (default count of system)\n"
 	"-o --output output file (default keys.txt)\n"
 	"--usage this menu\n"
 	"--highhead -H mode of high head...\n"
