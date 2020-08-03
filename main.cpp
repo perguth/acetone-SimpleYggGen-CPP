@@ -2,7 +2,7 @@
  * Спасибо PurpleI2P Project за активное содействие в написании этого кода.
  * notabug.org/acetone/SimpleYggGen-CPP
  *
- * acetone (c) GPLv3
+ * acetone, lialh4 (c) GPLv3
  *
  */
 
@@ -13,9 +13,9 @@
 #include <ctime>         // системное время
 #include <bitset>        // побитовое чтение
 #include <cstring>		 // memcmp - побайтовое сравнение
+#include <vector>
 
 #define KEYSIZE 32
-#define SHA512SIZE 128
 
 ////////////////////////////////////////////////// Заставка и прочая вода
 
@@ -48,13 +48,13 @@
 			srand(time(NULL));
 			int rv = 60;
 			std::cout << std::endl
-			<< "|                                      |" << getrandom(2,44)   << std::endl
-			<< "| SimpleYggGen C++ 1.0-headhunter 2020 |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "  " << getrandom(rv, 6) << "  " << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
-			<< "|   OpenSSL inside: x25519 -> sha512   |" << getrandom(rv, 2)  << "  "          << getrandom(rv,13) << "  " << getrandom(rv, 6) << "  " << getrandom(rv, 5)  << "  "         << getrandom(rv, 10)	<< std::endl
-			<< "| notabug.org/acetone/SimpleYggGen-CPP |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 3)	<< "     " << getrandom(rv, 2) << std::endl
-			<< "|           acetone (c) GPLv3          |" << getrandom(rv, 10) <<         "  "  << getrandom(rv,13) <<         "  "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 6)	<<    "  " << getrandom(rv, 2) << std::endl
-			<< "|                                      |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
-			<< "|     "  << __DATE__ << "         "  << __TIME__ <<  "     |"	    << getrandom(2,44) << std::endl;
+			<< "|   SimpleYggGen C++ 1.0-headhunter    |" << getrandom(2,44)   << std::endl
+			<< "|   OpenSSL inside: x25519 -> sha512   |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "  " << getrandom(rv, 6) << "  " << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
+			<< "| notabug.org/acetone/SimpleYggGen-CPP |" << getrandom(rv, 2)  << "  "          << getrandom(rv,13) << "  " << getrandom(rv, 6) << "  " << getrandom(rv, 5)  << "  "         << getrandom(rv, 10)	<< std::endl
+			<< "|                                      |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 3)	<< "     " << getrandom(rv, 2) << std::endl
+			<< "| developers: lialh4, acetone, orignal |" << getrandom(rv, 10) <<         "  "  << getrandom(rv,13) <<         "  "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 6)	<<    "  " << getrandom(rv, 2) << std::endl
+			<< "|            GPLv3  (c) 2020           |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
+			<< "| "  << __DATE__ << "                 "  << __TIME__ <<  " |"	    << getrandom(2,44) << std::endl;
 		}
 
 ////////////////////////////////////////////////// Суть вопроса
@@ -86,88 +86,98 @@ BoxKeys getKeyPair(void)
 	return keys;
 }
 
+int Ones(unsigned char HashValue[SHA512_DIGEST_LENGTH])
+{
+	unsigned char byte;
+	bool done;
+	int lOnes=0;
+	int nBits=0;
+	unsigned char temp[SHA512_DIGEST_LENGTH];
+	memset(temp, 0, sizeof(temp));
+	int z = 0;
+	std::vector<std::bitset<8>> bytes;
+	for(auto i = 0; i < SHA512_DIGEST_LENGTH; i++)
+	{
+		bytes.push_back(HashValue[i]);
+	}
+
+	for(auto bits : bytes){
+		for(int i = 7; i >= 0; --i)
+		{
+			if(bits[i] == 1 && !done)
+			{
+				++lOnes;
+				continue;
+			}
+			if(bits[i] == 0 && !done)
+			{
+				done = true;
+				continue;
+			}
+
+			byte = (byte << 1) | (bits[i] > 0 ? 1 : 0);
+			++nBits;
+
+			if(nBits >= 8)
+			{
+				nBits = 0;
+				temp[++z] = byte;
+			}
+		}
+	}
+	return lOnes;
+}
+
 void miner()
 {
-	unsigned char HashValue[SHA512SIZE];
+	unsigned char HashValue[SHA512_DIGEST_LENGTH];
 
 	uint8_t PublicKeyBest[KEYSIZE];
 	uint8_t PrivateKeyBest[KEYSIZE];
 
-	const unsigned char CheckByte[8] = {1, 3, 7, 15, 31, 63, 127, 255};
-
-	int totalcount= 0;	// счетчик циклов
-	int bitcount = 9; 	// переменная для хранения наибольшего количества единиц
-
 	// ------------------------ ОСНОВНОЙ ЦИКЛ
 
-	bool count50 = false;
+	int bitcount = 9; 	// переменная для хранения наибольшего количества единиц (не с нуля начинаем)
+
+	int totalcount= 0;	// счетчик основного цикла
+	bool count50 = false; // счетчики для отображения прогресса
 	bool count100 = true;
 	bool count500 = true;
 
 	while(true)
 	{
-		int bufmemcmp = 300;		// принимает возвращаемое значение memcmp, инициализированно случайным значением (шутка про тракториста)
-		int bit = 0;				// счетчик для подсчета единиц
-
-
-		std::string s_first4bytes;	// !!! переменная для хранения хэша
-		bool done = false;			// сигнал о завершении анализа хэша
-
 		BoxKeys myKeys = getKeyPair();
 		SHA512(myKeys.PublicKey, KEYSIZE, HashValue);
+		int newones = Ones(HashValue);
 
-		// ---------- bitset
-		std::bitset<8> bits_header(HashValue[0]);		// получаем биты первого байта хэша
-		s_first4bytes = bits_header.to_string(); 		// сохраняем их в стринг
-
-		for(int y = 1; y < 4; ++y)						// добавляем еще 3 байта
+		if(newones > bitcount)
 		{
-		std::bitset<8> bits_header_temp(HashValue[y]);
-		s_first4bytes += bits_header_temp.to_string();
-		}
-
-	// bits ----------------------------------
-
-		bit = 0;
-		while(s_first4bytes[bit] != '0' && s_first4bytes[bit] == '1' ) // цикл побитового анализа
-		{
-		++bit;
-			if(bit > bitcount) // сохраняем связку лучших ключей
+			bitcount = newones;
+			for(int i = 0; i < KEYSIZE; ++i)
 			{
-				bitcount = bit;
-				for(int z = 0; z < KEYSIZE; ++z)
-				{
-					PublicKeyBest[z] = myKeys.PublicKey[z];
-				}
-				for(int z = 0; z < KEYSIZE; ++z)
-				{
-					PrivateKeyBest[z] = myKeys.PrivateKey[z];
-				}
-
-				// outout -------------------------------
-				if(s_first4bytes[bit] == '0')
-				{
-					std::cout << "\nAddress:    [2" << std::setw(2) << std::setfill('0') << std::hex << bitcount << ":...]" << std::endl;
-					std::cout << "PublicKey:  ";
-					for(int i = 0; i < 32; ++i)
-					{
-						std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)PublicKeyBest[i];
-					}
-					std::cout << std::endl;
-
-					std::cout << "PrivateKey: ";
-					for(int i = 0; i < 32; ++i)
-					{
-						std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)PrivateKeyBest[i];
-					}
-					std::cout << std::endl;
-					count50 = false;
-					count100 = true;
-					count500 = true;
-					totalcount = 0;
-				}
+				PublicKeyBest[i] = myKeys.PublicKey[i];
+				PrivateKeyBest[i] = myKeys.PrivateKey[i];
 			}
+			std::cout << "\nAddress:    [2" << std::setw(2) << std::setfill('0') << std::hex << bitcount << ":...]" << std::endl;
+			std::cout << "PublicKey:  ";
+			for(int i = 0; i < 32; ++i)
+			{
+				std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)PublicKeyBest[i];
+			}
+			std::cout << std::endl;
+
+			std::cout << "PrivateKey: ";
+			for(int i = 0; i < 32; ++i)
+			{
+				std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)PrivateKeyBest[i];
+			}
+			std::cout << std::endl;
+			count50 = false;
+			count100 = true;
+			count500 = true;
+			totalcount = 0;
 		}
+
 
 		++totalcount;
 		if(totalcount % 50000 == 0 && !count50)
