@@ -2,7 +2,7 @@
  * Спасибо PurpleI2P Project за активное содействие в написании этого кода.
  * notabug.org/acetone/SimpleYggGen-CPP
  *
- * acetone (c) GPLv3
+ * acetone, lialh4 (c) GPLv3
  *
  */
 
