@@ -64,7 +64,7 @@ void intro()
 			<< "| notabug.org/acetone/SimpleYggGen-CPP |" << getrandom(rv, 2)  << "  "          << getrandom(rv,13) << "  " << getrandom(rv, 6) << "  " << getrandom(rv, 5)  << "  "         << getrandom(rv, 10)	<< std::endl
 			<< "|                                      |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 3)	<< "     " << getrandom(rv, 2) << std::endl
 			<< "| developers: lialh4, acetone, orignal |" << getrandom(rv, 10) <<         "  "  << getrandom(rv,13) <<         "  "                     << getrandom(rv, 5)  << "  "         << getrandom(rv, 6)	<<    "  " << getrandom(rv, 2) << std::endl
-			<< "|            GPLv3  (c) 2020           |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
+			<< "|            GPLv3 (c) 2020            |" << getrandom(rv, 2)  << "          "  << getrandom(rv, 5) << "          "                     << getrandom(rv, 5)  << "          " << getrandom(rv, 2)	<< std::endl
 			<< "| "  << __DATE__ << "                 "  << __TIME__ <<  " |"	    << getrandom(2,44) << std::endl
 #ifdef __linux__
 << RST << std::endl ;
