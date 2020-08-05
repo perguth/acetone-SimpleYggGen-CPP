@@ -1,7 +1,24 @@
 libraries= -lcrypto -lpthread
-compiler = g++
+cxx = g++
 files= SimpleYggGen.cpp
+ncursesfiles=ncurses/field.c ncurses/ncurses-interface.c
+ncursesoptions=-lform -lmenu -lncurses -fpermissive
 programname=SimpleYggGen
 CXFLAG=-std=gnu++11
-all:
-	$(compiler) $(files) $(CXFLAG) $(libraries) -o $(programname)
+GTKINTERFACENAME=interface
+c = gcc
+GTKDIR=GTK
+all: SimpleYggGen gtk 
+	
+	cp $(GTKDIR)/$(GTKINTERFACENAME) $(GTKDIR)/*.glade .
+SimpleYggGen: 
+	$(cxx) $(files) $(ncursesfiles) $(CXFLAG) $(libraries) $(ncursesoptions) -o $(programname)
+gtk:
+	cd $(GTKDIR) && make 
+
+clear:
+	rm $(programname) $(GTKINTERFACENAME) # GTK.glade
+
+
+	
+	
