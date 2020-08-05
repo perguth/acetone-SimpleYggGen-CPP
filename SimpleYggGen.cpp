@@ -112,7 +112,7 @@ static inline bool NotThat(const char *a, const char *b) {
 
 void usage(void) {
   const constexpr char *help = NAMEPROGRAM
-      " [text-pattern|regex-pattern] [options]\n"
+      " [text-pattern(for just search by text, like to 200:ffff)] [options]\n"
       "-h --help, help menu\n"
       "-r --reg, (^2.*ffff.*$)  regexp instead just text pattern (e.g. '(one|two).*')\n"
       "--threads -t, (default count of system)\n"
