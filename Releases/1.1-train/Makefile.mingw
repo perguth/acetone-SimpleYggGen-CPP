@@ -1,0 +1,34 @@
+CXX      = g++
+WINDRES  = windres
+
+SYG_SRC  = sygcpp.cpp
+SYG_RC   = windows/resource.rc
+SYGCPP   = sygcpp
+
+LDFLAGS  += -O3 -s -Wl,-Bstatic
+LDLIBS   += -static-libgcc -lcrypto -lws2_32 -lpthread
+
+SYG_OBJS += $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
+SYG_OBJS += $(patsubst %.rc,obj/%.o,$(SYG_RC))
+
+all: mk_obj_dir $(SYGCPP)
+
+mk_obj_dir:
+	@mkdir -p obj/windows
+
+clean:
+	$(RM) -r obj $(SYGCPP)
+
+
+obj/%.o: %.cpp
+	$(CXX) -c -o $@ $<
+
+obj/%.o: %.rc
+	$(WINDRES) -i $< -o $@
+
+$(SYGCPP): $(SYG_OBJS)
+	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS)
+
+.PHONY: all
+.PHONY: clean
+.PHONY: mk_obj_dir
