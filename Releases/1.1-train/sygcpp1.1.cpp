@@ -1,4 +1,4 @@
-/*
+/**
  * Thanks PurpleI2P Project for support to writing that code.
  *
  * IRC: irc.ilita.i2p port 6667 || 303:60d4:3d32:a2b9::3 port 16667
@@ -35,7 +35,7 @@ void intro()
 	<< " |                     OpenSSL inside: x25519 -> sha512                     |" << std::endl
 	<< " |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl
 	<< " |                                                                          |" << std::endl
-	<< " |                   developers: acetone, lialh4, orignal                   |" << std::endl
+	<< " |               developers:  acetone, orignal, lialh4, R4SAS               |" << std::endl
 	<< " |                              GPLv3 (c) 2020                              |" << std::endl
 	<< " +";
 	for(int i = 0; i < 74; ++i)
@@ -139,7 +139,7 @@ void testoutput()
 		{
 			test.close();
 			std::ofstream output(log_file);
-			output <<  "**************************************************************************\n"
+			output << "**************************************************************************\n"
 			       << "Change EncryptionPublicKey and EncryptionPrivateKey to your yggdrasil.conf\n"
 			       << "Windows: C:\\ProgramData\\Yggdrasil\\yggdrasil.conf\n"
 			       << "Debian: /etc/yggdrasil.conf\n\n"
