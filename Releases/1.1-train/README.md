@@ -4,18 +4,23 @@
 
 * Run MSYS2 MinGW 64-bit shell
 * Install required packages
-```bash
+```
 pacman -S make mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl
 ```
 * Compile application
-```bash
+```
 make -f Makefile.mingw
 ```
 * Run it using `sygcpp.exe`
 
 ### How build on Linux
 
-```bash
+* Install required packages
+```
 sudo apt-get install make g++ libssl-dev
+```
+* Compile application
+```
 make -f Makefile.linux
 ```
+* Run it using `./sygcpp`
