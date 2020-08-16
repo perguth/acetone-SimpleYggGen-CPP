@@ -1,7 +1,7 @@
 CXX      = g++
 WINDRES  = windres
 
-SYG_SRC  = sygcpp.cpp
+SYG_SRC  = sygcpp1.1.cpp
 SYG_RC   = windows/resource.rc
 SYGCPP   = sygcpp
 
