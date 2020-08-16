@@ -1,4 +1,4 @@
-# SYG-CPP
+# SYG-CPP 1.1 "TRAIN"
 
 ### How build on windows under MSYS2 shell
 
