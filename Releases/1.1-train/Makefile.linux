@@ -1,5 +1,4 @@
 CXX      = g++
-WINDRES  = windres
 
 SYG_SRC  = sygcpp1.1.cpp
 SYGCPP   = sygcpp
