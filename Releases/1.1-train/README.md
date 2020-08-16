@@ -1,6 +1,6 @@
 # SYG-CPP 1.1 "TRAIN"
 
-### How build on windows under MSYS2 shell
+### How build on Windows under MSYS2 shell
 
 * Run MSYS2 MinGW 64-bit shell
 * Install required packages
