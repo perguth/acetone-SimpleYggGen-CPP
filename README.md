@@ -2,7 +2,7 @@
 
 Simple Yggdrasil Address Miner on C++. Простой майнер адресов Yggdrasil на C++.
 
-Wiki page: [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp) or [Clearnet mirror](http://91.210.169.33/doku.php?id=yggdrasil:simpleygggen_cpp).
+Wiki page (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp) or [Clearnet mirror](http://91.210.169.33/doku.php?id=yggdrasil:simpleygggen_cpp).
 
 #### Sources of the current version in the Releases directory.
 
