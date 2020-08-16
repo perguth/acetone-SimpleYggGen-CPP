@@ -1,4 +1,4 @@
-# SYGCPP
+# SYG-CPP
 
 ### How build on windows under MSYS2 shell
 
