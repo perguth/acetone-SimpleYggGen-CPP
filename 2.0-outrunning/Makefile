@@ -1,16 +1,36 @@
-SYS := $(shell $(CXX) -dumpmachine)
-CXX      = g++
+CXX := g++
+SYS = $(shell $(CXX) -dumpmachine)
 
-SYG_SRC = sygcpp2.0.cpp
+STATIC := no
+DEBUG  := no
+
+SYG_SRC = sygcpp.cpp
 SYGCPP  = sygcpp
 
-LDFLAGS = -O3 -s
-LDLIBS  = -lcrypto -lpthread
+ifeq ($(DEBUG),yes)
+	CXX_DEBUG = -g
+else
+	LD_DEBUG = -s
+endif
 
-SYG_OBJS += $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
+CXXFLAGS = $(CXX_DEBUG) -fPIC
+LDFLAGS  = $(LD_DEBUG) -Os
+
+SYG_OBJS = $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
 
 ifneq (, $(findstring mingw, $(SYS))$(findstring cygwin, $(SYS)))
 	include Makefile.mingw
+else
+	ifeq ($(STATIC),yes)
+		LIBPATH = /usr/lib/$(SYS)
+		LDLIBS  = -pthread $(LIBPATH)/libcrypto.a -lpthread -ldl
+	else ifeq ($(STATIC),full)
+		LIBPATH = /usr/lib/$(SYS)
+		LDFLAGS += -static
+		LDLIBS  = -pthread $(LIBPATH)/libcrypto.a -lpthread -ldl
+	else
+		LDLIBS = -lcrypto -lpthread
+	endif
 endif
 
 all: mk_obj_dir $(SYGCPP)
@@ -22,7 +42,7 @@ clean:
 	$(RM) -r obj $(SYGCPP)
 
 obj/%.o: %.cpp
-	$(CXX) -c -o $@ $<
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(SYGCPP): $(SYG_OBJS)
 	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS)
