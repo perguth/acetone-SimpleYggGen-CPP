@@ -8,14 +8,12 @@ SYG_SRC = sygcpp.cpp
 SYGCPP  = sygcpp
 
 ifeq ($(DEBUG),yes)
-	CXX_DEBUG = -g
+	CXXFLAGS := -g
 else
-	LD_DEBUG = -s -Os
+	LDFLAGS := -s -Os
 endif
 
-CXXFLAGS = $(CXX_DEBUG) -fPIC
-LDFLAGS  = $(LD_DEBUG)
-
+CXXFLAGS += -fPIC
 SYG_OBJS = $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
 
 ifneq (, $(findstring mingw, $(SYS))$(findstring cygwin, $(SYS)))

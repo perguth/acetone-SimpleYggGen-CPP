@@ -1,5 +1,4 @@
 WINDRES  = windres
-
 SYG_RC   = windows/resource.rc
 
 LDFLAGS  += -Wl,-Bstatic
