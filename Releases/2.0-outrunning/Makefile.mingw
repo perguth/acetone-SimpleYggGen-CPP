@@ -1,0 +1,11 @@
+WINDRES  = windres
+
+SYG_RC   = windows/resource.rc
+
+LDFLAGS  = -O3 -s -Wl,-Bstatic
+LDLIBS   = -static-libgcc -lcrypto -lws2_32 -lpthread
+
+SYG_OBJS += $(patsubst %.rc,obj/%.o,$(SYG_RC))
+
+obj/%.o: %.rc
+	$(WINDRES) -i $< -o $@
