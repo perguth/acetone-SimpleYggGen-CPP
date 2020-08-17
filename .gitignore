@@ -1,4 +1,4 @@
-Releases/2.0-outrunning/obj
-Releases/2.0-outrunning/sygcpp*
-Releases/2.0-outrunning/syg-*.txt
-Releases/2.0-outrunning/sygcpp.conf
+/2.0-outrunning/obj
+/2.0-outrunning/sygcpp*
+/2.0-outrunning/syg-*.txt
+/2.0-outrunning/sygcpp.conf
