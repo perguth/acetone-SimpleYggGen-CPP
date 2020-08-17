@@ -10,11 +10,11 @@ SYGCPP  = sygcpp
 ifeq ($(DEBUG),yes)
 	CXX_DEBUG = -g
 else
-	LD_DEBUG = -s
+	LD_DEBUG = -s -Os
 endif
 
 CXXFLAGS = $(CXX_DEBUG) -fPIC
-LDFLAGS  = $(LD_DEBUG) -Os
+LDFLAGS  = $(LD_DEBUG)
 
 SYG_OBJS = $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
 
