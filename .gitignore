@@ -1,3 +1,4 @@
-sygcpp.exe
-syg-high.txt
-syg-byname.txt
+Releases/2.0-outrunning/obj
+Releases/2.0-outrunning/sygcpp*
+Releases/2.0-outrunning/syg-*.txt
+Releases/2.0-outrunning/sygcpp.conf
