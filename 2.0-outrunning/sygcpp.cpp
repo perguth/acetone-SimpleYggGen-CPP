@@ -9,13 +9,10 @@
  * acetone, 2020 (c) GPLv3
  *
  */
-#define SODIUM_STATIC
-
 #include <openssl/evp.h> // библиотека OpenSSL
 #include <openssl/sha.h>
 #include <openssl/bn.h>
 #include <sodium.h>      // библиотека libsodium
-#include <ws2tcpip.h>    // преобразование в IPv6
 #include <iostream>      // вывод на экран
 #include <string>
 #include <sstream>
@@ -28,6 +25,13 @@
 #include <chrono>        // для паузы в заставке
 #include <ctime>
 
+#ifdef _WIN32            // преобразование в IPv6
+	#include <ws2tcpip.h>
+#else
+	#include <ifaddrs.h>
+#endif
+
+#define SODIUM_STATIC
 ////////////////////////////////////////////////// Заставка
 
 void intro()
