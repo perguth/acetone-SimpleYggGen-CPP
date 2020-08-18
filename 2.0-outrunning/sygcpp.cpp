@@ -6,7 +6,8 @@
  *
  * git: notabug.org/acetone/SimpleYggGen-CPP
  *
- * acetone, 2020 (c) GPLv3
+ * developers:  acetone, lialh4, orignal, R4SAS, Vort
+ * developers team, 2020 (c) GPLv3
  *
  */
 #include <openssl/evp.h> // библиотека OpenSSL
