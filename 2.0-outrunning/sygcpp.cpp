@@ -440,9 +440,7 @@ int main()
 			threads[i]->detach();
 
 		threads[conf_proc-1]->join(); // "ждем" последний трэд, бесконечное ожидание
-	}
-	else
-	{
+	} else {
 		std::thread * threads[conf_proc];
 		for(int i = 0; i < conf_proc; ++i)
 			threads[i] = new std::thread(nameminer);
