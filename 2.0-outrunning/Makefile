@@ -8,9 +8,9 @@ SYG_SRC = sygcpp.cpp
 SYGCPP  = sygcpp
 
 ifeq ($(DEBUG),yes)
-	CXXFLAGS := -g
+	CXXFLAGS := -g -O3
 else
-	LDFLAGS := -s -Os
+	LDFLAGS := -s 
 endif
 
 CXXFLAGS += -fPIC
