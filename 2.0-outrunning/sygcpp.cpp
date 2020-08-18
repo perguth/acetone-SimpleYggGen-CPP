@@ -127,9 +127,7 @@ int config()
 		{
 			countsize = 250000;
 			khstemp = 250000000.0;
-		}
-		else
-		{
+		} else {
 			countsize = 500000;
 			khstemp = 500000000.0;
 		}
