@@ -13,6 +13,7 @@
 #include <openssl/evp.h> // библиотека OpenSSL
 #include <openssl/sha.h>
 #include <openssl/bn.h>
+#include <ws2tcpip.h>    // преобразование в IPv6
 #include <iostream>      // вывод на экран
 #include <string>
 #include <sstream>
@@ -30,19 +31,19 @@
 void intro()
 {
 	std::cout << std::endl
-	<< " +----------------------------------------------------------------------------+" << std::endl
-	<< " |                         SimpleYggGen C++ 1.1-train                         |" << std::endl
-	<< " |                      OpenSSL inside: x25519 -> sha512                      |" << std::endl
-	<< " |                    notabug.org/acetone/SimpleYggGen-CPP                    |" << std::endl
-	<< " |                                                                            |" << std::endl
-	<< " |                developers:  acetone, lialh4, orignal, R4SAS                |" << std::endl
-	<< " |                               GPLv3 (c) 2020                               |" << std::endl
+	<< " +--------------------------------------------------------------------------+" << std::endl
+	<< " |                        SimpleYggGen C++ 2.0-train                        |" << std::endl
+	<< " |                     OpenSSL inside: x25519 -> sha512                     |" << std::endl
+	<< " |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl
+	<< " |                                                                          |" << std::endl
+	<< " |            developers:  acetone, lialh4, orignal, R4SAS, Vort            |" << std::endl
+	<< " |                              GPLv3 (c) 2020                              |" << std::endl
 	<< " +";
-	for(int i = 0; i < 76; ++i)
+	for(int i = 0; i < 74; ++i)
 	{
 		std::cout << "-";
 		std::cout.flush();
-		std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	std::cout << "+" << std::endl;
 }
@@ -59,6 +60,7 @@ int conf_high = 0;
 std::string conf_search;
 std::string log_file;
 
+std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
 uint64_t totalcount = 0;        // счетчик основного цикла
 uint64_t totalcountfortune = 0; // счетчик нахождений
 bool newline = true;            // используется для вывода счетчика
@@ -227,7 +229,16 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 			}
 		}
 	}
+	uint8_t ipAddr[16];
+	ipAddr[0] = 0x02;
+	ipAddr[1] = lErase - 1;
+	for (int i = 0; i < 14; ++i)
+		ipAddr[i + 2] = HashValue[i];
 
+	char ipStrBuf[46];
+	inet_ntop(AF_INET6, ipAddr, ipStrBuf, 46);
+	return std::string(ipStrBuf);
+/*
 	std::string address;
 	bool shortadd = false;
 	std::stringstream ss(address);
@@ -265,7 +276,7 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 		if(i != 13 && i % 2 != 0) // не выводим двоеточие в конце адреса и после первого байта секции
 			ss << ":";
 	}
-	return ss.str();
+	return ss.str(); */
 }
 
 void getConsoleLog()
@@ -281,8 +292,15 @@ void getConsoleLog()
 		}
 		std::time_t realtime = std::time(NULL);
 
-		std::cout << " # count [ " << std::dec << std::setfill('.') << std::setw(19) << totalcount << " ] [ "
-		          << std::setw(15) << totalcountfortune << " ] " << std::asctime(std::localtime(&realtime));
+		auto stopTime = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
+		startTime = stopTime;
+		float khs = 250000000.0 / duration.count();
+
+		std::cout << " [ " << std::setw(8) << std::fixed << std::setprecision(3) << std::setfill(' ') << khs << " kH/s ] Total: "
+		          << std::setfill('_') << std::left << std::dec << std::setw(16) << totalcount << " Find: "
+		          << std::setw(3) << totalcountfortune << " " << std::right
+				  << std::asctime(std::localtime(&realtime));
 		std::cout.flush();
 	}
 	mtx.unlock();
@@ -295,6 +313,7 @@ void highminer()
 	uint8_t PublicKeyBest[KEYSIZE];
 	uint8_t PrivateKeyBest[KEYSIZE];
 
+	startTime = std::chrono::high_resolution_clock::now();
 	while(true)
 	{
 		BoxKeys myKeys = getKeyPair();
@@ -360,7 +379,7 @@ void nameminer()
 
 	uint8_t PublicKeyBest[KEYSIZE];
 	uint8_t PrivateKeyBest[KEYSIZE];
-
+	startTime = std::chrono::high_resolution_clock::now();
 	while(true)
 	{
 		BoxKeys myKeys = getKeyPair();
