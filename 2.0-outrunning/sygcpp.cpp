@@ -27,7 +27,7 @@
 #ifdef _WIN32            // преобразование в IPv6
 	#include <ws2tcpip.h>
 #else
-	#include <ifaddrs.h>
+	#include <arpa/inet.h>
 #endif
 
 ////////////////////////////////////////////////// Заставка
@@ -47,9 +47,9 @@ void intro()
 	{
 		std::cout << "-";
 		std::cout.flush();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(3));
 	}
-	std::cout << "+" << std::endl;
+	std::cout << "+\n" << std::endl;
 }
 
 ////////////////////////////////////////////////// Суть вопроса
@@ -66,10 +66,14 @@ int conf_high = 0;
 std::string conf_search;
 std::string log_file;
 
-std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+std::chrono::time_point<std::chrono::high_resolution_clock> startTime; // для вывода kH/s
+std::time_t sygstartedin = std::time(NULL); // для вывода времени работы
+
 uint64_t totalcount = 0;        // счетчик основного цикла
 uint64_t totalcountfortune = 0; // счетчик нахождений
-bool newline = true;            // используется для вывода счетчика
+int countsize = 0;              // определяет периодичность вывода счетчика
+double khstemp = 0.0;           // для подсчета килохешей
+bool newline = true;            // используется для вывода счетчика: пустая строка после найденного адреса
 
 int config()
 {
@@ -103,18 +107,32 @@ int config()
 		conffile.close();
 		if(conf_mode > 1 || conf_mode < 0 || conf_log > 1 || conf_log < 0 || conf_high < 0) // проверка полученных значений
 		{
-			std::cerr << " Invalid config found!\n"
-			          << " Check it:\n"
-			          << " - 2 field - mining mode: 0 or 1 only\n"
-			          << " - 3 field - logging mode: 0 or 1 only\n"
-			          << " - 5 field - string to search by name: a-z, 0-9 and ':' symbols only\n"
-			          << " Remove or correct sygcpp.conf and run SYG again."<< std::endl;
+			std::cerr << " Invalid config found! Check it:\n";
+
+			if(conf_mode > 1 || conf_mode < 0)
+				std::cerr << " - field #2 - mining mode: 0 or 1 only\n";
+			if(conf_log > 1 || conf_log < 0)
+				std::cerr << " - field #3 - logging mode: 0 or 1 only\n";
+			if(conf_high < 0)
+				std::cerr << " - field #4 - start position for high address search (default 9)\n";
+
+			    std::cerr << " Remove or correct sygcpp.conf and run SYG again."<< std::endl;
 			return -2;
 		}
 
 		unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
 		if(conf_proc > (int)processor_count)
 			conf_proc = (int)processor_count;
+		if(conf_proc <= 2)
+		{
+			countsize = 250000;
+			khstemp = 250000000.0;
+		}
+		else
+		{
+			countsize = 500000;
+			khstemp = 500000000.0;
+		}
 	}
 
 	// вывод конфигурации на экран
@@ -235,71 +253,34 @@ std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
 	char ipStrBuf[46];
 	inet_ntop(AF_INET6, ipAddr, ipStrBuf, 46);
 	return std::string(ipStrBuf);
-
-	/* Старая самопоисная функция. Оказалась медленнее стандартной.
-	std::string address;
-	bool shortadd = false;
-	std::stringstream ss(address);
-	ss << 0x02 << std::setw(2) << std::setfill('0') << std::hex << lErase - 1 << ":";
-	// 2 - константа подсети Yggdrasil, второй байт - кол-во лидирующих единиц в хешэ
-
-	for(int i = 0; i < 14; ++i)
-	{
-		if(i % 2 == 0) // если работаем с первым байтом секции
-		{
-			if(HashValue[i] == 0) // если байт нулевой
-			{
-				if(HashValue[i+1] == 0) // если следующий байт нулевой
-				{
-					if(HashValue[i+2] == 0 && i+2 < 13 && HashValue[i+3] == 0 && i+3 <= 13 && !shortadd)
-					{
-						ss << ":";
-						i += 3;
-						shortadd = true;
-						continue;
-					} else {
-						ss << "0";
-						++i;
-					}
-				}
-			} else {
-				ss << std::hex << (int)HashValue[i];
-			}
-		} else { // если работаем со вторым байтом секции
-			if(HashValue[i-1] == 0) // если предыдущий первый байт был нулевой, нули сокращаем
-				ss << std::hex << (int)HashValue[i];
-			else
-				ss << std::setw(2) << std::setfill('0') << std::hex << (int)HashValue[i];
-		}
-		if(i != 13 && i % 2 != 0) // не выводим двоеточие в конце адреса и после первого байта секции
-			ss << ":";
-	}
-	return ss.str(); */
 }
 
 void getConsoleLog()
 {
 	mtx.lock();
 	++totalcount;
-	if(totalcount % 250000 == 0)
+	if(totalcount % countsize == 0)
 	{
 		if(newline)
 		{
 			std::cout << std::endl;
 			newline = false;
 		}
-		std::time_t realtime = std::time(NULL);
 
 		auto stopTime = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stopTime - startTime);
 		startTime = stopTime;
-		float khs = 250000000.0 / duration.count();
+		float khs = khstemp / duration.count();
 
-		std::cout << " [ " << std::setw(8) << std::fixed << std::setprecision(3) << std::setfill(' ') << khs << " kH/s ] Total: "
-		          << std::setfill('_') << std::left << std::dec << std::setw(16) << totalcount << " Find: "
-		          << std::setw(3) << totalcountfortune << " " << std::right
-				  << std::asctime(std::localtime(&realtime));
-		std::cout.flush();
+		auto timedays = (std::time(NULL) - sygstartedin) / 86400;
+		auto timehours = ((std::time(NULL) - sygstartedin) - (timedays * 86400)) / 3600;
+		auto timeminutes = ((std::time(NULL) - sygstartedin) - (timedays * 86400) - (timehours * 3600)) / 60;
+		auto timeseconds = (std::time(NULL) - sygstartedin) - (timedays * 86400) - (timehours * 3600) - (timeminutes * 60);
+
+		std::cout << " kH/s: [" << std::setw(7) << std::dec << std::fixed << std::setprecision(3)
+		<< std::setfill('_') << khs << "] Total: [" << std::setw(19) << totalcount << "] Found: ["
+		<< std::setw(3) << totalcountfortune << "] Uptime: " << timedays << ":" << std::setw(2) << std::setfill('0')
+		<< timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds << std::endl;
 	}
 	mtx.unlock();
 }
@@ -443,7 +424,7 @@ int main()
 	int configcheck = config();
 	if(configcheck < 0) // функция получения конфигурации
 	{
-		std::cerr << "Error code: " << configcheck << std::endl;
+		std::cerr << " Error code: " << configcheck << std::endl << std::endl;
 		system("PAUSE");
 		return configcheck;
 	}

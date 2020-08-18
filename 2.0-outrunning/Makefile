@@ -5,13 +5,14 @@ STATIC := no
 DEBUG  := no
 
 SYG_SRC = sygcpp.cpp
-SYGCPP  = sygcpp
+SYGCPP  = build/sygcpp
 
 ifeq ($(DEBUG),yes)
-	CXXFLAGS := -g
+	CXXFLAGS := -g -Og
+	LDFLAGS := -Og
 else
 	CXXFLAGS := -O3
-	LDFLAGS := -s 
+	LDFLAGS := -s -O3
 endif
 
 CXXFLAGS += -fPIC
@@ -22,13 +23,9 @@ ifneq (, $(findstring mingw, $(SYS))$(findstring cygwin, $(SYS)))
 else
 	ifeq ($(STATIC),yes)
 		LIBPATH = /usr/lib/$(SYS)
-		LDLIBS  = -pthread $(LIBPATH)/libcrypto.a -lpthread -ldl
-	else ifeq ($(STATIC),full)
-		LIBPATH = /usr/lib/$(SYS)
-		LDFLAGS += -static
-		LDLIBS  = -pthread $(LIBPATH)/libcrypto.a -lpthread -ldl
+		LDLIBS  = -pthread $(LIBPATH)/libsodium.a -lpthread -ldl
 	else
-		LDLIBS = -lcrypto -lpthread
+		LDLIBS = -lsodium -lpthread
 	endif
 endif
 
@@ -36,6 +33,7 @@ all: mk_obj_dir $(SYGCPP)
 
 mk_obj_dir:
 	@mkdir -p obj/windows
+	@mkdir -p build
 
 clean:
 	$(RM) -r obj $(SYGCPP)

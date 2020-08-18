@@ -8,8 +8,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 MAINICON ICON "syg-cpp-logo.ico"
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 1,1,0,0
-PRODUCTVERSION 1,1,0,0
+FILEVERSION 2,0,0,0
+PRODUCTVERSION 2,0,0,0
 
 FILEOS 0x40004L
 FILETYPE 0x1L
@@ -22,11 +22,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "acetone"
             VALUE "FileDescription", "SimpleYggGen"
-            VALUE "FileVersion", "1.1.0.0"
+            VALUE "FileVersion", "2.0.0.0"
             VALUE "LegalCopyright", "Copyright (C) 2020, acetone"
-            VALUE "OriginalFilename", "sygcpp"
+            VALUE "OriginalFilename", "sygcpp.exe"
             VALUE "ProductName", "SimpleYggGen"
-            VALUE "ProductVersion", "1.1-train"
+            VALUE "ProductVersion", "2.0-outrunning"
         END
     END
     BLOCK "VarFileInfo"
