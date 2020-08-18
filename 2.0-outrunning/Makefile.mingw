@@ -2,7 +2,7 @@ WINDRES  = windres
 SYG_RC   = windows/resource.rc
 
 LDFLAGS  += -Wl,-Bstatic
-LDLIBS   = -static-libgcc -lcrypto -lws2_32 -lpthread
+LDLIBS   = -static-libgcc -lsodium -lws2_32 -lpthread
 
 SYG_OBJS += $(patsubst %.rc,obj/%.o,$(SYG_RC))
 

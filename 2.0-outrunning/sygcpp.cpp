@@ -9,10 +9,12 @@
  * acetone, 2020 (c) GPLv3
  *
  */
+#define SODIUM_STATIC
 
 #include <openssl/evp.h> // библиотека OpenSSL
 #include <openssl/sha.h>
 #include <openssl/bn.h>
+#include <sodium.h>      // библиотека libsodium
 #include <ws2tcpip.h>    // преобразование в IPv6
 #include <iostream>      // вывод на экран
 #include <string>
@@ -162,21 +164,11 @@ struct BoxKeys
 BoxKeys getKeyPair()
 {
 	BoxKeys keys;
-	size_t len = KEYSIZE;
-
-	EVP_PKEY_CTX * Ctx;
-	EVP_PKEY * Pkey = nullptr;
-	Ctx = EVP_PKEY_CTX_new_id (NID_X25519, NULL);
-
-	EVP_PKEY_keygen_init (Ctx);
-	EVP_PKEY_keygen (Ctx, &Pkey);
-
-	EVP_PKEY_get_raw_public_key (Pkey, keys.PublicKey, &len);
-	EVP_PKEY_get_raw_private_key (Pkey, keys.PrivateKey, &len);
-
-	EVP_PKEY_CTX_free(Ctx);
-	EVP_PKEY_free(Pkey);
-
+	randombytes(keys.PrivateKey, KEYSIZE);
+	keys.PrivateKey[0] &= 248;
+	keys.PrivateKey[KEYSIZE - 1] &= 127;
+	keys.PrivateKey[KEYSIZE - 1] |= 64;
+	crypto_scalarmult_curve25519_base(keys.PublicKey, keys.PrivateKey);
 	return keys;
 }
 
@@ -240,7 +232,7 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 	inet_ntop(AF_INET6, ipAddr, ipStrBuf, 46);
 	return std::string(ipStrBuf);
 
-	/* Старая самопоисная функция. Оказалась медленнее стандартной. 
+	/* Старая самопоисная функция. Оказалась медленнее стандартной.
 	std::string address;
 	bool shortadd = false;
 	std::stringstream ss(address);
@@ -319,7 +311,7 @@ void highminer()
 	while(true)
 	{
 		BoxKeys myKeys = getKeyPair();
-		SHA512(myKeys.PublicKey, KEYSIZE, HashValue);
+		crypto_hash_sha512(HashValue, myKeys.PublicKey, KEYSIZE);
 		int newones = getOnes(HashValue);
 
 		if(newones > conf_high) // сохранение лучших ключей
@@ -385,7 +377,7 @@ void nameminer()
 	while(true)
 	{
 		BoxKeys myKeys = getKeyPair();
-		SHA512(myKeys.PublicKey, KEYSIZE, HashValue);
+		crypto_hash_sha512(HashValue, myKeys.PublicKey, KEYSIZE);
 		std::string tempstr = getAddress(HashValue);
 
 		if(tempstr.find(conf_search.c_str()) != std::string::npos) // сохранение найденных ключей
