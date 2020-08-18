@@ -10,9 +10,7 @@
  * developers team, 2020 (c) GPLv3
  *
  */
-#include <openssl/evp.h> // библиотека OpenSSL
-#include <openssl/sha.h>
-#include <openssl/bn.h>
+
 #include <sodium.h>      // библиотека libsodium
 #include <iostream>      // вывод на экран
 #include <string>
@@ -32,7 +30,6 @@
 	#include <ifaddrs.h>
 #endif
 
-#define SODIUM_STATIC
 ////////////////////////////////////////////////// Заставка
 
 void intro()
@@ -40,7 +37,7 @@ void intro()
 	std::cout << std::endl
 	<< " +--------------------------------------------------------------------------+" << std::endl
 	<< " |                     SimpleYggGen C++  2.0-outrunning                     |" << std::endl
-	<< " |                     OpenSSL inside: x25519 -> sha512                     |" << std::endl
+	<< " |                    libsodium inside: x25519 -> sha512                    |" << std::endl
 	<< " |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl
 	<< " |                                                                          |" << std::endl
 	<< " |            developers:  acetone, lialh4, orignal, R4SAS, Vort            |" << std::endl
@@ -57,7 +54,9 @@ void intro()
 
 ////////////////////////////////////////////////// Суть вопроса
 
+#define SODIUM_STATIC
 #define KEYSIZE 32
+
 std::mutex mtx;
 
 int conf_proc = 0;
@@ -177,7 +176,7 @@ BoxKeys getKeyPair()
 	return keys;
 }
 
-int getOnes(const unsigned char HashValue[SHA512_DIGEST_LENGTH])
+int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
 {
 	bool done = false;
 	int lOnes = 0; // кол-во лидирующих единиц
@@ -199,7 +198,7 @@ int getOnes(const unsigned char HashValue[SHA512_DIGEST_LENGTH])
 	return lOnes;
 }
 
-std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
+std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
 {
 	// функция "портит" массив хэша, т.к. копирование массива не происходит
 	int lErase = getOnes(HashValue) + 1; // лидирующие единицы и первый ноль
@@ -307,7 +306,7 @@ void getConsoleLog()
 
 void highminer()
 {
-	unsigned char HashValue[SHA512_DIGEST_LENGTH];
+	unsigned char HashValue[crypto_hash_sha512_BYTES];
 
 	uint8_t PublicKeyBest[KEYSIZE];
 	uint8_t PrivateKeyBest[KEYSIZE];
@@ -321,6 +320,7 @@ void highminer()
 
 		if(newones > conf_high) // сохранение лучших ключей
 		{
+			std::right;
 			conf_high = newones;
 			for(int i = 0; i < KEYSIZE; ++i)
 			{
@@ -374,7 +374,7 @@ void highminer()
 
 void nameminer()
 {
-	unsigned char HashValue[SHA512_DIGEST_LENGTH];
+	unsigned char HashValue[crypto_hash_sha512_BYTES];
 
 	uint8_t PublicKeyBest[KEYSIZE];
 	uint8_t PrivateKeyBest[KEYSIZE];
@@ -387,6 +387,7 @@ void nameminer()
 
 		if(tempstr.find(conf_search.c_str()) != std::string::npos) // сохранение найденных ключей
 		{
+			std::right;
 			for(int i = 0; i < KEYSIZE; ++i)
 			{
 				PublicKeyBest[i] = myKeys.PublicKey[i];
