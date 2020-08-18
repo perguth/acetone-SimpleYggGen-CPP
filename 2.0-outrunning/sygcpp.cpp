@@ -13,7 +13,7 @@
 #include <openssl/evp.h> // библиотека OpenSSL
 #include <openssl/sha.h>
 #include <openssl/bn.h>
-#include <ws2tcpip.h>    // преобразование в IPv6
+//#include <ws2tcpip.h>    // преобразование в IPv6
 #include <iostream>      // вывод на экран
 #include <string>
 #include <sstream>
@@ -32,7 +32,7 @@ void intro()
 {
 	std::cout << std::endl
 	<< " +--------------------------------------------------------------------------+" << std::endl
-	<< " |                        SimpleYggGen C++ 2.0-train                        |" << std::endl
+	<< " |                     SimpleYggGen C++  2.0-outrunning                     |" << std::endl
 	<< " |                     OpenSSL inside: x25519 -> sha512                     |" << std::endl
 	<< " |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl
 	<< " |                                                                          |" << std::endl
@@ -229,6 +229,7 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 			}
 		}
 	}
+	/*
 	uint8_t ipAddr[16];
 	ipAddr[0] = 0x02;
 	ipAddr[1] = lErase - 1;
@@ -238,7 +239,7 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 	char ipStrBuf[46];
 	inet_ntop(AF_INET6, ipAddr, ipStrBuf, 46);
 	return std::string(ipStrBuf);
-/*
+	*/
 	std::string address;
 	bool shortadd = false;
 	std::stringstream ss(address);
@@ -276,7 +277,7 @@ std::string getAddress(unsigned char HashValue[SHA512_DIGEST_LENGTH])
 		if(i != 13 && i % 2 != 0) // не выводим двоеточие в конце адреса и после первого байта секции
 			ss << ":";
 	}
-	return ss.str(); */
+	return ss.str();
 }
 
 void getConsoleLog()
