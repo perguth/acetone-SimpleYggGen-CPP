@@ -6,7 +6,7 @@
 * Install required packages
 
 ```bash
-pacman -S make mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl
+pacman -S make mingw-w64-x86_64-gcc mingw-w64-x86_64-libsodium
 ```
 
 * Compile application
@@ -22,7 +22,7 @@ make
 * Install required packages
 
 ```
-sudo apt-get install make g++ libssl-dev
+sudo apt-get install make g++ libsodium-dev
 ```
 
 * Compile application
