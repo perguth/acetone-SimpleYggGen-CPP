@@ -36,8 +36,8 @@ void intro()
 {
 	std::cout << std::endl
 	<< " +--------------------------------------------------------------------------+" << std::endl
-	<< " |                     SimpleYggGen C++  2.0-outrunning                     |" << std::endl
-	<< " |                    libsodium inside: x25519 -> sha512                    |" << std::endl
+	<< " |                        SimpleYggGen C++  2.1-vort                        |" << std::endl
+	<< " |                altered libsodium inside: x25519 -> sha512                |" << std::endl
 	<< " |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl
 	<< " |                                                                          |" << std::endl
 	<< " |            developers:  acetone, lialh4, orignal, R4SAS, Vort            |" << std::endl
