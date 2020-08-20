@@ -30,6 +30,9 @@
 	#include <arpa/inet.h>
 #endif
 
+#define SODIUM_STATIC
+#define KEYSIZE 32
+
 ////////////////////////////////////////////////// Заставка
 
 void intro()
@@ -52,10 +55,7 @@ void intro()
 	std::cout << "+\n" << std::endl;
 }
 
-////////////////////////////////////////////////// Суть вопроса
-
-#define SODIUM_STATIC
-#define KEYSIZE 32
+////////////////////////////////////////////////// Глобальные переменные
 
 std::mutex mtx;
 
@@ -67,13 +67,15 @@ std::string conf_search;
 std::string log_file;
 
 std::chrono::time_point<std::chrono::high_resolution_clock> startTime; // для вывода kH/s
+double khstemp = 0.0;           // для подсчета килохешей
 std::time_t sygstartedin = std::time(NULL); // для вывода времени работы
 
 uint64_t totalcount = 0;        // счетчик основного цикла
 uint64_t totalcountfortune = 0; // счетчик нахождений
 int countsize = 0;              // определяет периодичность вывода счетчика
-double khstemp = 0.0;           // для подсчета килохешей
 bool newline = true;            // используется для вывода счетчика: пустая строка после найденного адреса
+
+////////////////////////////////////////////////// Суть вопроса
 
 int config()
 {
@@ -198,24 +200,21 @@ BoxKeys getKeyPair()
 
 int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
 {
-	bool done = false;
 	int lOnes = 0; // кол-во лидирующих единиц
-
-	std::vector<std::bitset<8>> bytes; // вектор с однобайтовыми битсетами (двумерный массив)
-	for(int i = 0; i < 32; ++i)        // всего 32 байта, т.к. лидирующих единиц больше быть не может (32*8 = 256 бит, а ff = 255)
-		bytes.push_back(HashValue[i]); // вставка в вектор с битсетами одного i-того байта хэша
-
-	for(auto vector_count = bytes.begin(); vector_count != bytes.end() && !done; vector_count++)
+	for (int i = 0; i < 32; ++i) // всего 32 байта, т.к. лидирующих единиц больше быть не может (32*8 = 256 бит, а ff = 255)
 	{
-		for(int i = 7; i >= 0 && !done; --i)
+		std::bitset<8> bits(HashValue[i]);
+		for (int i = 7; i >= 0; --i)
 		{
-			if((*vector_count)[i] == 1) // обращение к i-тому элементу битсета
+			if (bits[i] == 1) // обращение к i-тому элементу битсета
 				++lOnes;
-			if((*vector_count)[i] == 0)
-				done = true;
+			else
+				return lOnes;
 		}
 	}
-	return lOnes;
+	std::cerr << "Strange error in getOnes function!" << std::endl;
+	system("PAUSE");
+	return -3; // это случится только если будет найдено больше 256 единиц, а это невозможно
 }
 
 std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
