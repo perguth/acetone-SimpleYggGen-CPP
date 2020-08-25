@@ -4,7 +4,7 @@ SYG_RC   = windows/resource.rc
 LDFLAGS  += -Wl,-Bstatic
 LDLIBS   = -static-libgcc -lsodium -lws2_32 -lpthread
 
-SYG_OBJS += $(patsubst %.rc,obj/%.o,$(SYG_RC))
+SYG_OBJS += $(patsubst %.rc,_build/obj/%.o,$(SYG_RC))
 
-obj/%.o: %.rc
+_build/obj/%.o: %.rc
 	$(WINDRES) -i $< -o $@

@@ -5,18 +5,19 @@ STATIC := no
 DEBUG  := no
 
 SYG_SRC = sygcpp.cpp x25519.cpp
-SYGCPP  = build/sygcpp
+SYGCPP  = _build/sygcpp
+
+CXXFLAGS := -march=core2
 
 ifeq ($(DEBUG),yes)
-	CXXFLAGS := -g -Og
-	LDFLAGS := -Og
+	CXXFLAGS += -g -O3
+#	CXXFLAGS += -g -Og
 else
-	CXXFLAGS := -O3 -march=core2
-	LDFLAGS := -s -O3
+	CXXFLAGS += -O3
+	LDFLAGS := -s
 endif
 
-CXXFLAGS += -fPIC
-SYG_OBJS = $(patsubst %.cpp,obj/%.o,$(SYG_SRC))
+SYG_OBJS = $(patsubst %.cpp,_build/obj/%.o,$(SYG_SRC))
 
 ifneq (, $(findstring mingw, $(SYS))$(findstring cygwin, $(SYS)))
 	include Makefile.mingw
@@ -32,17 +33,16 @@ endif
 all: mk_obj_dir $(SYGCPP)
 
 mk_obj_dir:
-	@mkdir -p obj/windows
-	@mkdir -p build
+	@mkdir -p _build/obj/windows
 
 clean:
-	$(RM) -r obj $(SYGCPP)
+	$(RM) -r _build/obj $(SYGCPP)
 
-obj/%.o: %.cpp
+_build/obj/%.o: %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(SYGCPP): $(SYG_OBJS)
-	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS) x25519-x86_64.obj
+	$(CXX) -o $@ $^ $(LDFLAGS) $(LDLIBS)
 
 .PHONY: all
 .PHONY: clean
