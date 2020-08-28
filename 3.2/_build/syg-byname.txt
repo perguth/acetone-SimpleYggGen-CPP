@@ -1,0 +1,8 @@
+**************************************************************************
+Change EncryptionPublicKey and EncryptionPrivateKey to your yggdrasil.conf
+Windows: C:\ProgramData\Yggdrasil\yggdrasil.conf
+Debian: /etc/yggdrasil.conf
+
+Visit HowTo.Ygg wiki for more information (russian language page):
+http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp
+**************************************************************************
