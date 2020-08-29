@@ -37,8 +37,6 @@ make
 
 * Run it using `./sygcpp`
 
-*Note*: If you want compile static binary, add `STATIC=yes` or `STATIC=full` to `make` command. That works only on Linux.
-
 
 ```
 IRC Chat:
