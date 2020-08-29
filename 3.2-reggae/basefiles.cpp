@@ -1,17 +1,3 @@
-/**
- *
- * Функция генерирует и парсит конфигурационный файл.
- * Вынесена в отдельный *.cpp с версии 3.2 для удобства.
- *
- */
-#include <x86intrin.h>
-#include <iostream>     
-#include <string>
-#include <sstream>
-#include <fstream>
-#include <thread>
-#include <regex>
-
 struct option 
 {
 	int proc = 0;
@@ -46,17 +32,16 @@ int config()
 				<< "* Count of thread: 1\n\n"
 				<< "  0 - by pattern, 1 - high address, 2 - search by pattern & high\n"
 				<< "  3 - regexp, 4 - search by regexp & high.\n"
-				<< "* Mining option: 0\n\n"
+				<< "* Mining option: 1\n\n"
 				<< "  0 - console output only, 1 - log to file.\n"
 				<< "* Logging mode: 1\n\n"
-				<< "  Attention: parameter is set in decimal notation (0 - 9),\n"
-				<< "  displayed in the address in hexadecimal (0 - 9, a -f).\n"
-				<< "* Start position (for high address search): 15\n\n"
-				<< "  Used when \"Mining mode\" set as 0 or 3\n"
+				<< "  High address search. Parameter is set in decimal notation (0-9),\n"
+				<< "  displayed in the address in hexadecimal (0-9, a-f).\n"
+				<< "* Start position: 15\n\n"
+				<< "  Used when \"Mining mode\" set as 0 or 2.\n"
 				<< "* Pattern: ::\n\n"
-				<< "  Used when \"Mining mode\" set as 4 or 5\n"
-				<< "  If you don't know regexp see it: https://regexr.com/\n"
-				<< "* Regexp: ^2.*ffff.*$";
+				<< "  Used when \"Mining mode\" set as 3 or 4. Extended grep type.\n"
+				<< "* Regexp: ^2..:ffff.*.eeee$";
 		newconf.close();
 		
 		std::ifstream conffile ("sygcpp.conf");
@@ -102,7 +87,7 @@ int config()
 					return -4;
 				}
 			}
-			if(str_temp_read == "search):")
+			if(str_temp_read == "position:")
 			{
 				ss_input >> conf.high;
 				if(ss_input.fail())
@@ -163,10 +148,16 @@ void testoutput()
 {
 	if(conf.log) // проверка включено ли логирование
 	{
-		if(conf.mode)
+		if(conf.mode == 0)
+			conf.outputfile = "syg-pattern.txt";
+		else if(conf.mode == 1)
 			conf.outputfile = "syg-high.txt";
-		else
-			conf.outputfile = "syg-byname.txt";
+		else if(conf.mode == 2)
+			conf.outputfile = "syg-pattern-high.txt";
+		else if(conf.mode == 3)
+			conf.outputfile = "syg-regexp.txt";
+		else if(conf.mode == 4)
+			conf.outputfile = "syg-regexp-high.txt";
 
 		std::ifstream test(conf.outputfile);
 		if(!test) // проверка наличия выходного файла
@@ -176,9 +167,7 @@ void testoutput()
 			output << "**************************************************************************\n"
 			       << "Change EncryptionPublicKey and EncryptionPrivateKey to your yggdrasil.conf\n"
 			       << "Windows: C:\\ProgramData\\Yggdrasil\\yggdrasil.conf\n"
-			       << "Debian: /etc/yggdrasil.conf\n\n"
-			       << "Visit HowTo.Ygg wiki for more information (russian language page):\n"
-			       << "http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp\n"
+			       << "Debian: /etc/yggdrasil.conf\n"
 			       << "**************************************************************************\n";
 			output.close();
 		} else test.close();

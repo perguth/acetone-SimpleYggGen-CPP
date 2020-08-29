@@ -3,8 +3,8 @@
  * IRC: irc.ilita.i2p port 6667 || 303:60d4:3d32:a2b9::3 port 16667
  * general channels: #ru and #howtoygg
  *
- * acetone (default) git:           notabug.org/acetone/SimpleYggGen-CPP
- * Vort (v2 and v3 author) git:     notabug.org/Vort/SimpleYggGen-CPP
+ * acetone (default) git: notabug.org/acetone/SimpleYggGen-CPP
+ * Vort (member) git:     notabug.org/Vort/SimpleYggGen-CPP
  *
  * developers:  acetone, lialh4, orignal, R4SAS, Vort
  * developers team, 2020 (c) GPLv3
@@ -35,12 +35,11 @@
 
 #include "x25519.h"
 #include "sha512.h"
-#include "config.cpp"
+#include "basefiles.cpp"
 
 #define BLOCKSIZE 10000
 
-//#define SELF_CHECK
-
+//#define SELF_CHECK // debug
 
 ////////////////////////////////////////////////// Заставка
 
@@ -63,12 +62,13 @@ void intro()
 
 std::mutex mtx;
 
-int countsize = 0; // определяет периодичность вывода счетчика
-
 std::time_t sygstartedin = std::time(NULL); // для вывода времени работы
 
+int countsize = 0;               // определяет периодичность вывода счетчика
 uint64_t block_count = 0;        // количество вычисленных блоков
 uint64_t totalcountfortune = 0;  // счетчик нахождений
+bool newline = false;            // форматирует вывод после нахождения адреса
+
 std::chrono::steady_clock::duration blocks_duration(0);
 
 int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
@@ -145,6 +145,7 @@ void logStatistics()
 			"] Found: [" << std::setw(3) << totalcountfortune <<
 			"] Uptime: " << timedays << ":" << std::setw(2) << std::setfill('0') <<
 			timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds << std::endl;
+		newline = true;
 	}
 }
 
@@ -156,7 +157,6 @@ std::string hexArrayToString(const uint8_t* bytes, int length)
 	return ss.str();
 }
 
-
 std::string keyToString(const key25519 key)
 {
 	return hexArrayToString(key, KEYSIZE);
@@ -167,9 +167,13 @@ std::string hashToString(const uint8_t hash[crypto_hash_sha512_BYTES])
 	return hexArrayToString(hash, crypto_hash_sha512_BYTES);
 }
 
-
 void logKeys(std::string address, const key25519 publicKey, const key25519 privateKey)
 {
+	if(newline) // добавляем пустую строку на экране между счетчиком и новым адресом
+	{
+		std::cout << std::endl;
+		newline = false;
+	}
 	std::cout << " Address:    " << address << std::endl;
 	std::cout << " PublicKey:  " << keyToString(publicKey) << std::endl;
 	std::cout << " PrivateKey: " << keyToString(privateKey) << std::endl;
@@ -211,6 +215,7 @@ void miner_thread()
 	keys_block block(BLOCKSIZE);
 	uint8_t random_bytes[KEYSIZE];
 	uint8_t sha512_hash[crypto_hash_sha512_BYTES];
+	std::regex regx(conf.rgx_search, std::regex_constants::egrep);
 	for (;;)
 	{
 		auto start_time = std::chrono::steady_clock::now();
@@ -223,6 +228,15 @@ void miner_thread()
 			block.get_public_key(public_key, i);
 			crypto_hash_sha512(sha512_hash, public_key);
 
+			if (T == 0) // pattern mining
+			{
+				if (getAddress(sha512_hash).find(
+					conf.str_search.c_str()) != std::string::npos)
+				{
+					fortune_key_index = i;
+					break; // можно использовать только один ключ из блока
+				}
+			}
 			if (T == 1) // high mining
 			{
 				int newones = getOnes(sha512_hash);
@@ -232,13 +246,37 @@ void miner_thread()
 					fortune_key_index = i;
 				}
 			}
-			else // name mining
+			if (T == 2) // pattern & high mining
 			{
+				int newones = getOnes(sha512_hash);
 				if (getAddress(sha512_hash).find(
-					conf.str_search.c_str()) != std::string::npos)
+					conf.str_search.c_str()) != std::string::npos &&
+					newones > conf.high)
+				{
+					conf.high = newones;
+					fortune_key_index = i;
+					break;
+				}
+			}
+			if (T == 3) // regexp mining
+			{
+				//std::regex regx(conf.rgx_search, std::regex::extended);
+				if (std::regex_search((getAddress(sha512_hash)), regx))
 				{
 					fortune_key_index = i;
-					break; // можно использовать только один ключ из блока
+					break;
+				}
+			}
+			if (T == 4) // regexp & high mining
+			{
+				int newones = getOnes(sha512_hash);
+				//std::regex regx(conf.rgx_search, std::regex::extended);
+				if (std::regex_search((getAddress(sha512_hash)), regx) &&
+					newones > conf.high)
+				{
+					conf.high = newones;
+					fortune_key_index = i;
+					break;
 				}
 			}
 		}
@@ -251,7 +289,7 @@ void miner_thread()
 	}
 }
 
-#ifdef SELF_CHECK
+#ifdef SELF_CHECK // debug
 void selfCheck()
 {
 	std::cout << "Self-check started." << std::endl;
@@ -298,7 +336,7 @@ void selfCheck()
 	}
 	std::cout << "Self-check finished." << std::endl;
 }
-#endif
+#endif // debug
 
 // ------------------------------------------------------
 int main()
@@ -324,10 +362,18 @@ int main()
 	config_print();
 	
 	testoutput();
-
+	
 	std::thread* lastThread;
 	for (int i = 0; i < conf.proc; i++)
-		lastThread = new std::thread(conf.mode ? miner_thread<1> : miner_thread<0>);
+	{
+		lastThread = new std::thread(
+			conf.mode == 0 ? miner_thread<0> : 
+			conf.mode == 1 ? miner_thread<1> : 
+			conf.mode == 2 ? miner_thread<2> :
+			conf.mode == 3 ? miner_thread<3> :
+			miner_thread<4> 
+		);
+	}
 	lastThread->join();
 
 	std::cerr << "SYG has stopped working unexpectedly! Please, report about this.";
