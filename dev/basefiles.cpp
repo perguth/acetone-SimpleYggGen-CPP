@@ -26,7 +26,7 @@ int config()
 			return -1;
 		}
 		newconf << "####################################################################\n"
-				<< "#                SimpleYggGen C++ configuraton file                #\n"
+				<< "#               SimpleYggGen C++ configuration file.               #\n"
 				<< "# If you have some errors, try delete this file and run SYG again. #\n"
 				<< "####################################################################\n\n"
 				<< "* Count of thread: 1\n\n"
@@ -156,13 +156,16 @@ int config()
 		if(conf.mode == 0)
 			std::cout << "search by pattern (" << conf.str_search << "), ";
 		else if(conf.mode == 1)
-			std::cout << "search high addresses (" << conf.high << "), ";
+			std::cout << "search high addresses (2" << std::setw(2) << std::setfill('0') << 
+				std::hex << conf.high << std::dec << "+), ";
 		else if(conf.mode == 2)
-			std::cout << "search by pattern & high (" << conf.str_search << " & " << conf.high << "), ";
+			std::cout << "search by pattern & high (" << conf.str_search << " & 2" << 
+				std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec <<"+), ";
 		else if(conf.mode == 3)
 			std::cout << "search by regexp (" << conf.rgx_search << "), ";
 		else if(conf.mode == 4)
-			std::cout << "search by regexp & high (" << conf.rgx_search << " & " << conf.high << "), ";
+			std::cout << "search by regexp & high (" << conf.rgx_search << " & 2" << 
+			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
 
 		if(conf.log)
 			std::cout << "logging to text file.";
