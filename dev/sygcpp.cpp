@@ -47,7 +47,7 @@ void Intro()
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                      SimpleYggGen C++  3.2.1-legend                      |" << std::endl <<
+		" |                     SimpleYggGen C++  dev.ver_3.2.1+                     |" << std::endl <<
 		" |                         X25519 -> SHA512 -> IPv6                         |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
@@ -95,10 +95,11 @@ std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
 
 	bool changeit = false;
 	int bigbyte = 0;
+	int needlen = 15 + (lErase/8); // количество байт адреса + байты лид.единиц 
 
 	for(int j = 0; j < lErase; ++j) // побитовое смещение
 	{
-		for(int i = 63; i >= 0; --i)
+		for(int i = needlen; i >= 0; --i)
 		{
 			if(bigbyte == i+1) // предыдущий байт требует переноса
 				changeit = true;
