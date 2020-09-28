@@ -2,7 +2,7 @@
 
 Simple Yggdrasil address miner on C++. Простой майнер адресов Yggdrasil на C++.
 
-Wiki page (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
+Wiki (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
 
 ### How build on windows under MSYS2 shell
 
