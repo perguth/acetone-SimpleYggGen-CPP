@@ -6,7 +6,7 @@
  * acetone (default) git: notabug.org/acetone/SimpleYggGen-CPP
  * Vort (member) git:     notabug.org/Vort/SimpleYggGen-CPP
  *
- * developers: Vort, acetone, R4SAS, lialh4, orignal
+ * developers: Vort, acetone, R4SAS, lialh4, filarius, orignal
  * developers team, 2020 (c) GPLv3
  *
  */
@@ -41,14 +41,12 @@
 
 //#define SELF_CHECK // debug
 
-////////////////////////////////////////////////// Заставка
-
 void Intro()
 {
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                   [  SimpleYggGen C++ 3.3-worldwide  ]                   |" << std::endl <<
+		" |                   [ SimpleYggGen C++ 3.3+dev.version ]                   |" << std::endl <<
 		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
@@ -56,8 +54,6 @@ void Intro()
 		" +--------------------------------------------------------------------------+" << std::endl <<
 		std::endl;
 }
-
-////////////////////////////////////////////////// Суть вопроса
 
 std::mutex mtx;
 
@@ -73,13 +69,13 @@ std::chrono::steady_clock::duration blocks_duration(0);
 
 int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
 {
+	const int map[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
 	int lOnes = 0; // кол-во лидирующих единиц
 	for (int i = 0; i < 32; ++i) // всего 32 байта, т.к. лидирующих единиц больше быть не может (32*8 = 256 бит, а ff = 255)
 	{
-		std::bitset<8> bits(HashValue[i]);
-		for (int i = 7; i >= 0; --i)
+		for (int j = 0; j < 8; ++j)
 		{
-			if (bits[i] == 1) // обращение к i-тому элементу битсета
+			if (HashValue[i] & map[j]) // сравниваем биты байта с таблицей единичек
 				++lOnes;
 			else
 				return lOnes;
@@ -93,38 +89,35 @@ void getRawAddress(int lErase, unsigned char * HashValue, uint8_t * rawAddr) // 
 	// функция портит массив хэша, вызывать повторно со старым массивом нельзя
 	++lErase; // лидирующие единицы и первый ноль
 
-	bool changeit = false;
-	int bigbyte = 0;
-	int needlen = 15 + (lErase/8); // количество байт адреса + байты лид.единиц 
-
-	for(int j = 0; j < lErase; ++j) // побитовое смещение
+	/*
+	int ones = getOnes(HashValue) ;
+    int start =  (ones + 1); // лидирующие единицы и первый ноль
+    int bitshift = start % 8;
+    start = start/8;
+  
+    for (int i = start;i<start+15;i++){
+        HashValue[i] <<= bitshift;
+        HashValue[i] |= HashValue[i+1] >> (8-bitshift);
+    }
+  
+    arr[0] = 0x02;
+    arr[1] = ones;
+    for (int i = 0; i < 14; ++i)
+        arr[i + 2] = HashValue[i+start];
+	 */
+	int bitshift = lErase % 8;
+	int start = lErase / 8;
+	
+	for(int i = start; i < start+15; ++i)
 	{
-		for(int i = needlen; i >= 0; --i)
-		{
-			if(bigbyte == i+1) // предыдущий байт требует переноса
-				changeit = true;
-
-			if(HashValue[i] & 0x80)
-				bigbyte = i;
-
-			HashValue[i] <<= 1;
-
-			if(changeit)
-			{
-				HashValue[i] |= 0x01;
-				changeit = false;
-			}
-		}
+		HashValue[i] <<= bitshift;
+		HashValue[i] |= (HashValue[i+1] >> (8-bitshift));
 	}
 
 	rawAddr[0] = 0x02;
 	rawAddr[1] = lErase - 1;
 	for (int i = 0; i < 14; ++i)
-		rawAddr[i + 2] = HashValue[i];
-	
-// 	char ipStrBuf[46];
-// 	inet_ntop(AF_INET6, rawAddr, ipStrBuf, 46);
-// 	std::cout << std::string(ipStrBuf) << std::endl;
+		rawAddr[i + 2] = HashValue[i+start];
 }
 
 std::string getAddress(const uint8_t * rawAddr)
