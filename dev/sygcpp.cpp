@@ -6,7 +6,7 @@
  * acetone (default) git: notabug.org/acetone/SimpleYggGen-CPP
  * Vort (member) git:     notabug.org/Vort/SimpleYggGen-CPP
  *
- * developers:  acetone, lialh4, orignal, R4SAS, Vort
+ * developers: Vort, acetone, R4SAS, lialh4, orignal
  * developers team, 2020 (c) GPLv3
  *
  */
@@ -35,6 +35,7 @@
 
 #include "x25519.h"
 #include "sha512.h"
+#include "cppcodec/base32_rfc4648.hpp"
 
 #define BLOCKSIZE 10000
 
@@ -47,11 +48,10 @@ void Intro()
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                     SimpleYggGen C++  dev.ver_3.2.1+                     |" << std::endl <<
-		" |                         X25519 -> SHA512 -> IPv6                         |" << std::endl <<
+		" |                   [  SimpleYggGen C++ 3.3-worldwide  ]                   |" << std::endl <<
+		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
-		" |            developers:  Vort, acetone, R4SAS, lialh4, orignal            |" << std::endl <<
 		" |                              GPLv3 (c) 2020                              |" << std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
 		std::endl;
@@ -88,10 +88,10 @@ int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
 	return -421; // это никогда не случится
 }
 
-std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
+void getRawAddress(int lErase, unsigned char * HashValue, uint8_t * rawAddr) // ожидается 64 и 16 байт
 {
-	// функция "портит" массив хэша, т.к. копирование массива не происходит
-	int lErase = getOnes(HashValue) + 1; // лидирующие единицы и первый ноль
+	// функция портит массив хэша, вызывать повторно со старым массивом нельзя
+	++lErase; // лидирующие единицы и первый ноль
 
 	bool changeit = false;
 	int bigbyte = 0;
@@ -117,15 +117,26 @@ std::string getAddress(unsigned char HashValue[crypto_hash_sha512_BYTES])
 		}
 	}
 
-	uint8_t ipAddr[16];
-	ipAddr[0] = 0x02;
-	ipAddr[1] = lErase - 1;
+	rawAddr[0] = 0x02;
+	rawAddr[1] = lErase - 1;
 	for (int i = 0; i < 14; ++i)
-		ipAddr[i + 2] = HashValue[i];
+		rawAddr[i + 2] = HashValue[i];
+	
+// 	char ipStrBuf[46];
+// 	inet_ntop(AF_INET6, rawAddr, ipStrBuf, 46);
+// 	std::cout << std::string(ipStrBuf) << std::endl;
+}
 
+std::string getAddress(const uint8_t * rawAddr)
+{
 	char ipStrBuf[46];
-	inet_ntop(AF_INET6, ipAddr, ipStrBuf, 46);
+	inet_ntop(AF_INET6, rawAddr, ipStrBuf, 46);
 	return std::string(ipStrBuf);
+}
+
+std::string getMeshname(const uint8_t * rawAddr)
+{
+	return std::string(cppcodec::base32_rfc4648::encode(rawAddr, 16));
 }
 
 void logStatistics()
@@ -168,14 +179,16 @@ std::string hashToString(const uint8_t hash[crypto_hash_sha512_BYTES])
 	return hexArrayToString(hash, crypto_hash_sha512_BYTES);
 }
 
-void logKeys(std::string address, const key25519 publicKey, const key25519 privateKey)
+void logKeys(uint8_t * raw, const key25519 publicKey, const key25519 privateKey)
 {
 	if(newline) // добавляем пустую строку на экране между счетчиком и новым адресом
 	{
 		std::cout << std::endl;
 		newline = false;
 	}
-	std::cout << " Address:    " << address << std::endl;
+	if (conf.mesh)
+		std::cout << " Domain:     " << getMeshname(raw) + ".meshname" << std::endl;
+	std::cout << " Address:    " << getAddress(raw) << std::endl;
 	std::cout << " PublicKey:  " << keyToString(publicKey) << std::endl;
 	std::cout << " PrivateKey: " << keyToString(privateKey) << std::endl;
 	std::cout << std::endl;
@@ -184,7 +197,9 @@ void logKeys(std::string address, const key25519 publicKey, const key25519 priva
 	{
 		std::ofstream output(conf.outputfile, std::ios::app);
 		output << std::endl;
-		output << "Address:              " << address << std::endl;
+		if (conf.mesh)
+			output << "Domain:               " << getMeshname(raw) + ".meshname" << std::endl;
+		output << "Address:              " << getAddress(raw) << std::endl;
 		output << "EncryptionPublicKey:  " << keyToString(publicKey) << std::endl;
 		output << "EncryptionPrivateKey: " << keyToString(privateKey) << std::endl;
 		output.close();
@@ -203,9 +218,10 @@ void process_fortune_key(const keys_block& block, int index)
 
 	uint8_t sha512_hash[crypto_hash_sha512_BYTES];
 	crypto_hash_sha512(sha512_hash, public_key);
-	std::string address = getAddress(sha512_hash);
-
-	logKeys(address, public_key, private_key);
+	int ones = getOnes(sha512_hash);
+	uint8_t raw[16];
+	getRawAddress(ones, sha512_hash, raw);
+	logKeys(raw, public_key, private_key);
 	++totalcountfortune;
 }
 
@@ -228,10 +244,13 @@ void miner_thread()
 		{
 			block.get_public_key(public_key, i);
 			crypto_hash_sha512(sha512_hash, public_key);
+			int newones = getOnes(sha512_hash);
+			uint8_t rawAddr[16]; 
+			getRawAddress(newones, sha512_hash, rawAddr);
 
-			if (T == 0) // pattern mining
+			if (T == 0) // IPv6 pattern mining
 			{
-				if (getAddress(sha512_hash).find(
+				if (getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos)
 				{
 					fortune_key_index = i;
@@ -240,7 +259,6 @@ void miner_thread()
 			}
 			if (T == 1) // high mining
 			{
-				int newones = getOnes(sha512_hash);
 				if (newones > conf.high)
 				{
 					conf.high = newones;
@@ -249,8 +267,7 @@ void miner_thread()
 			}
 			if (T == 2) // pattern & high mining
 			{
-				int newones = getOnes(sha512_hash);
-				if (getAddress(sha512_hash).find(
+				if (getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos &&
 					newones > conf.high)
 				{
@@ -259,21 +276,27 @@ void miner_thread()
 					break;
 				}
 			}
-			if (T == 3) // regexp mining
+			if (T == 3) // IPv6 regexp mining
 			{
-				if (std::regex_search((getAddress(sha512_hash)), regx))
+				if (std::regex_search((getAddress(rawAddr)), regx))
 				{
 					fortune_key_index = i;
 					break;
 				}
 			}
-			if (T == 4) // regexp & high mining
+			if (T == 4) // meshname pattern mining
 			{
-				int newones = getOnes(sha512_hash);
-				if (std::regex_search((getAddress(sha512_hash)), regx) &&
-					newones > conf.high)
+				if (getMeshname(rawAddr).find(
+					conf.str_search.c_str()) != std::string::npos)
 				{
-					conf.high = newones;
+					fortune_key_index = i;
+					break; // можно использовать только один ключ из блока
+				}
+			}
+			if (T == 5) // meshname regex mining
+			{
+				if (std::regex_search((getMeshname(rawAddr)), regx))
+				{
 					fortune_key_index = i;
 					break;
 				}
@@ -366,7 +389,8 @@ int main()
 			conf.mode == 1 ? miner_thread<1> : 
 			conf.mode == 2 ? miner_thread<2> :
 			conf.mode == 3 ? miner_thread<3> :
-			miner_thread<4> 
+			conf.mode == 4 ? miner_thread<4> :
+			miner_thread<5> 
 		);
 	}
 	lastThread->join();

@@ -4,6 +4,7 @@ struct option
 	int mode = 0;
 	int log  = 0;
 	int high = 0;
+	int mesh = 0;
 	std::string str_search;
 	std::string rgx_search;
 	std::string outputfile;
@@ -29,18 +30,23 @@ int config()
 				<< "#               SimpleYggGen C++ configuration file.               #\n"
 				<< "# If you have some errors, try delete this file and run SYG again. #\n"
 				<< "####################################################################\n\n"
-				<< "* Count of thread: 1\n\n"
-				<< "  0 - by pattern, 1 - high address, 2 - search by pattern & high,\n"
-				<< "  3 - regexp, 4 - search by regexp & high.\n"
+				<< "  Parameter limited by processors count on PC.\n"
+				<< "* Count of thread: 16\n\n"
+				<< "  0 - IPv6 pattern, 1 - high address, 2 - search by pattern & high,\n"
+				<< "  3 - IPv6 regexp, 4 - meshname pattern, 5 - meshname regexp\n"
 				<< "* Mining option: 1\n\n"
 				<< "  0 - console output only, 1 - log to file.\n"
 				<< "* Logging mode: 1\n\n"
 				<< "  High address search. Parameter is set in hexadecimal (0-9, a-f).\n"
 				<< "* Start position (2xx): 14\n\n"
-				<< "  Used when \"Mining mode\" set as 0 or 2.\n"
+				<< "  Used when \"Mining option\" set as 0, 2 or 4.\n"
+				<< "  Meshname domains use base32 (RFC4648) alphabet symbols.\n"
 				<< "* Pattern: ::\n\n"
-				<< "  Used when \"Mining mode\" set as 3 or 4. Extended grep type.\n"
-				<< "* Regexp: ^2.*.(1:ace|ace:1)$";
+				<< "  Used when \"Mining option\" set as 3 or 5. Extended grep type.\n"
+				<< "  When searching meshname domain, don't need use \".meshname\".\n"
+				<< "* Regexp: ^2.*f{1,4}.*.ace:(6|9)$\n\n"
+				<< "  0 - disable, 1 - enable.\n"
+				<< "* Display meshname domains: 1";
 		newconf.close();
 		
 		std::ifstream conffile ("sygcpp.conf");
@@ -61,14 +67,13 @@ int config()
 			bool mode = false;
 			bool log  = false;
 			bool high = false;
+			bool mesh = false;
 			bool str_search = false;
 			bool rgx_search = false;
 			
 			bool ok()
 			{
-				if(proc & mode & log & high & str_search & rgx_search)
-					return true;
-				return false;
+				return(proc & mode & log & high & mesh & str_search & rgx_search);
 			}
 		};
 		check complete;
@@ -90,7 +95,7 @@ int config()
 			if(str_temp_read == "option:")
 			{
 				ss_input >> conf.mode;
-				if(ss_input.fail() || (conf.mode > 4 || conf.mode < 0))
+				if(ss_input.fail() || (conf.mode > 5 || conf.mode < 0))
 				{
 					std::cerr << " Mining option value incorrect." << std::endl;
 					return -3;
@@ -137,11 +142,21 @@ int config()
 				}
 				complete.rgx_search = true;
 			}
+			if(str_temp_read == "domains:")
+			{
+				ss_input >> conf.mesh;
+				if(ss_input.fail() || (conf.mesh != 0 && conf.mesh != 1))
+				{
+					std::cerr << " Meshname display value incorrect." << std::endl;
+					return -8;
+				}
+				complete.mesh = true;
+			}
 		}
 		if(!complete.ok())
 		{
 			std::cerr << " Corrupted configuration file. Some parameters not found." << std::endl;
-			return -8;
+			return -9;
 		}
 
 		unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
@@ -154,23 +169,23 @@ int config()
 
 void DisplayConfig()
 {
-	// вывод конфигурации на экран
 	std::cout << " Threads: " << conf.proc << ", ";
 
 	if(conf.mode == 0)
-		std::cout << "search by pattern (" << conf.str_search << "), ";
+		std::cout << "IPv6 pattern (" << conf.str_search << "), ";
 	else if(conf.mode == 1)
 		std::cout << "search high addresses (2" << std::setw(2) << std::setfill('0') << 
 			std::hex << conf.high << std::dec << "+), ";
 	else if(conf.mode == 2)
 		std::cout << "search by pattern & high (" << conf.str_search << " & 2" << 
-			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec <<"+), ";
+ 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
 	else if(conf.mode == 3)
-		std::cout << "search by regexp (" << conf.rgx_search << "), ";
+		std::cout << "IPv6 regexp (" << conf.rgx_search << "), ";
 	else if(conf.mode == 4)
-		std::cout << "search by regexp & high (" << conf.rgx_search << " & 2" << 
-			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
-
+		std::cout << "meshname pattern (" << conf.str_search << "), ";
+	else if(conf.mode == 5)
+		std::cout << "meshname regexp (" << conf.rgx_search << "), ";
+	
 	if(conf.log)
 		std::cout << "logging to text file.";
 	else
@@ -184,15 +199,17 @@ void testoutput()
 	if(conf.log) // проверка включено ли логирование
 	{
 		if(conf.mode == 0)
-			conf.outputfile = "syg-pattern.txt";
+			conf.outputfile = "syg-ipv6-pattern.txt";
 		else if(conf.mode == 1)
-			conf.outputfile = "syg-high.txt";
+			conf.outputfile = "syg-ipv6-high.txt";
 		else if(conf.mode == 2)
-			conf.outputfile = "syg-pattern-high.txt";
+			conf.outputfile = "syg-ipv6-pattern-high.txt";
 		else if(conf.mode == 3)
-			conf.outputfile = "syg-regexp.txt";
+			conf.outputfile = "syg-ipv6-regexp.txt";
 		else if(conf.mode == 4)
-			conf.outputfile = "syg-regexp-high.txt";
+			conf.outputfile = "syg-meshname-pattern.txt";
+		else if(conf.mode == 5)
+			conf.outputfile = "syg-meshname-regexp.txt";
 
 		std::ifstream test(conf.outputfile);
 		if(!test) // проверка наличия выходного файла
