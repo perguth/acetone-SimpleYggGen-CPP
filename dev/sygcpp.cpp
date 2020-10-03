@@ -89,22 +89,6 @@ void getRawAddress(int lErase, unsigned char * HashValue, uint8_t * rawAddr) // 
 	// функция портит массив хэша, вызывать повторно со старым массивом нельзя
 	++lErase; // лидирующие единицы и первый ноль
 
-	/*
-	int ones = getOnes(HashValue) ;
-    int start =  (ones + 1); // лидирующие единицы и первый ноль
-    int bitshift = start % 8;
-    start = start/8;
-  
-    for (int i = start;i<start+15;i++){
-        HashValue[i] <<= bitshift;
-        HashValue[i] |= HashValue[i+1] >> (8-bitshift);
-    }
-  
-    arr[0] = 0x02;
-    arr[1] = ones;
-    for (int i = 0; i < 14; ++i)
-        arr[i + 2] = HashValue[i+start];
-	 */
 	int bitshift = lErase % 8;
 	int start = lErase / 8;
 	
