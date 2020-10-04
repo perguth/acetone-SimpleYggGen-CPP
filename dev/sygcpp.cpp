@@ -222,11 +222,11 @@ void miner_thread()
 			block.get_public_key(public_key, i);
 			crypto_hash_sha512(sha512_hash, public_key);
 			int newones = getOnes(sha512_hash);
-			uint8_t rawAddr[16]; 
-			getRawAddress(newones, sha512_hash, rawAddr);
-
+			
 			if (T == 0) // IPv6 pattern mining
 			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos)
 				{
@@ -244,6 +244,8 @@ void miner_thread()
 			}
 			if (T == 2) // pattern & high mining
 			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos &&
 					newones > conf.high)
@@ -255,6 +257,8 @@ void miner_thread()
 			}
 			if (T == 3) // IPv6 regexp mining
 			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (std::regex_search((getAddress(rawAddr)), regx))
 				{
 					fortune_key_index = i;
@@ -263,6 +267,8 @@ void miner_thread()
 			}
 			if (T == 4) // meshname pattern mining
 			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getMeshname(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos)
 				{
@@ -272,6 +278,8 @@ void miner_thread()
 			}
 			if (T == 5) // meshname regex mining
 			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (std::regex_search((getMeshname(rawAddr)), regx))
 				{
 					fortune_key_index = i;
