@@ -246,9 +246,8 @@ void miner_thread()
 			{
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
-				if (getAddress(rawAddr).find(
-					conf.str_search.c_str()) != std::string::npos &&
-					newones > conf.high)
+				if (newones > conf.high && getAddress(rawAddr).find(
+					conf.str_search.c_str()) != std::string::npos)
 				{
 					conf.high = newones;
 					fortune_key_index = i;

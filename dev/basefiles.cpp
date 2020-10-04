@@ -46,7 +46,7 @@ int config()
 				<< "  When searching meshname domain, don't need use \".meshname\".\n"
 				<< "* Regexp: ^2.*f{1,4}.*.ace:(6|9)$\n\n"
 				<< "  0 - disable, 1 - enable.\n"
-				<< "* Display meshname domains: 1";
+				<< "* Display meshname domains: 0";
 		newconf.close();
 		
 		std::ifstream conffile ("sygcpp.conf");
@@ -191,6 +191,8 @@ void DisplayConfig()
 	else
 		std::cout << "console log only.";
 
+	if((conf.mode == 4 || conf.mode == 5) && conf.mesh == 0)
+		conf.mesh = 1; // принудительно включаем отображение мешнейм-доменов при их майнинге
 	std::cout << std::endl << std::endl;
 }
 
