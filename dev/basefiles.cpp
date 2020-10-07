@@ -8,6 +8,10 @@ struct option
 	std::string str_search;
 	std::string rgx_search;
 	std::string outputfile;
+	
+	uint8_t raw_search[46];
+	int raw_size = 7; // 64 бита / 8 = 8 байт, нумерация с нуля => -1
+	bool raw_alarm = false; // для симпатичного вывода предупреждения
 };
 
 option conf;
@@ -95,7 +99,7 @@ int config()
 			if(str_temp_read == "option:")
 			{
 				ss_input >> conf.mode;
-				if(ss_input.fail() || (conf.mode > 5 || conf.mode < 0))
+				if(ss_input.fail() || (conf.mode > 6 || conf.mode < 0))
 				{
 					std::cerr << " Mining option value incorrect." << std::endl;
 					return -3;
@@ -185,6 +189,8 @@ void DisplayConfig()
 		std::cout << "meshname pattern (" << conf.str_search << "), ";
 	else if(conf.mode == 5)
 		std::cout << "meshname regexp (" << conf.rgx_search << "), ";
+	else if(conf.mode == 6)
+		std::cout << "subnet brute force (" << conf.str_search << "), ";
 	
 	if(conf.log)
 		std::cout << "logging to text file.";
@@ -212,6 +218,8 @@ void testoutput()
 			conf.outputfile = "syg-meshname-pattern.txt";
 		else if(conf.mode == 5)
 			conf.outputfile = "syg-meshname-regexp.txt";
+		else if(conf.mode == 6)
+			conf.outputfile = "syg-subnet-brute-force.txt";
 
 		std::ifstream test(conf.outputfile);
 		if(!test) // проверка наличия выходного файла

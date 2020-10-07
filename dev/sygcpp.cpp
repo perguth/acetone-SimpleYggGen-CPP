@@ -46,7 +46,7 @@ void Intro()
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                   [ SimpleYggGen C++ 3.3+dev.version ]                   |" << std::endl <<
+		" |                   [ SimpleYggGen C++ 3.4-subnetlover ]                   |" << std::endl <<
 		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
@@ -124,6 +124,15 @@ std::string getAddress(const uint8_t * rawAddr)
 std::string getMeshname(const uint8_t * rawAddr)
 {
 	return std::string(cppcodec::base32_rfc4648::encode(rawAddr, 16));
+}
+
+bool convertStrToRaw()
+{
+	if(conf.str_search[0] == '3') // замена 300::/64 на целевой 200::/7
+		conf.str_search[0] = '2';
+
+	bool result = inet_pton(AF_INET6, conf.str_search.c_str(), (void*)conf.raw_search);
+	return result;
 }
 
 void logStatistics()
@@ -220,6 +229,26 @@ void miner_thread()
 	uint8_t random_bytes[KEYSIZE];
 	uint8_t sha512_hash[crypto_hash_sha512_BYTES];
 	std::regex regx(conf.rgx_search, std::regex_constants::egrep);
+	
+	if (T == 6) // subnet brute force
+	{
+		mtx.lock();
+		if(!conf.raw_alarm) 
+		{
+			bool result = convertStrToRaw();
+			if(!result || (conf.str_search != getAddress(conf.raw_search)))
+			{
+				std::cerr << " +--------------------------------------------------------------------------+" << std::endl << 
+				             " |                  Warning! Address convertation trouble.                  |" << std::endl <<
+				             " +--------------------------------------------------------------------------+" << std::endl << 
+							 " STRING [ " << conf.str_search << " ] >> ADDRESS [ " << getAddress(conf.raw_search) << " ]" 
+							 << std::endl << std::endl;
+			}
+			conf.raw_alarm = true;
+		}
+		mtx.unlock();
+	}
+	
 	for (;;)
 	{
 		auto start_time = std::chrono::steady_clock::now();
@@ -253,7 +282,7 @@ void miner_thread()
 					 * блок не прерывается, т.к. с наибольшей вероятностью
 					 * администратором будет использован только последний,
 					 * самый высокий адрес из полученных.
-					 * 		@acetone
+					 * 	@acetone
 					 */
 				}
 			}
@@ -306,6 +335,16 @@ void miner_thread()
 				{
 					fortune_key_index = i;
 					break;
+				}
+			}
+			if (T == 6) // subnet brute force
+			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr);
+				for(int z = 0; conf.raw_search[z] == rawAddr[z]; ++z)
+				{
+					if (z == conf.raw_size)
+						fortune_key_index = i;
 				}
 			}
 		}
@@ -397,7 +436,8 @@ int main()
 			conf.mode == 2 ? miner_thread<2> :
 			conf.mode == 3 ? miner_thread<3> :
 			conf.mode == 4 ? miner_thread<4> :
-			miner_thread<5> 
+			conf.mode == 5 ? miner_thread<5> :
+			miner_thread<6> 
 		);
 	}
 	lastThread->join();
