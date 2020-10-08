@@ -411,7 +411,7 @@ void miner_thread()
 				getRawAddress(newones, sha512_hash, rawAddr);
 				for(int z = 0; conf.raw_search[z] == rawAddr[z]; ++z)
 				{
-					if (z == conf.raw_size)
+					if (z == conf.sbt_size)
 						fortune_key_index = i;
 				}
 			}
@@ -475,34 +475,61 @@ void selfCheck()
 #endif // debug
 
 // ------------------------------------------------------
+void startThreads()
+{
+	std::thread* lastThread;
+	for (int i = 0; i < conf.proc; i++)
+	{
+		lastThread = new std::thread(
+			conf.mode == 0 ? miner_thread<0> : 
+			conf.mode == 1 ? miner_thread<1> : 
+			conf.mode == 2 ? miner_thread<2> :
+			conf.mode == 3 ? miner_thread<3> :
+			conf.mode == 4 ? miner_thread<4> :
+			conf.mode == 5 ? miner_thread<5> :
+			miner_thread<6> 
+		);
+	}
+	lastThread->join();
+}
+
 void error()
 {
-	std::cerr << "\n Incorrect input. Use -help, bro.\n";
+	std::cerr << std::endl <<
+	" +--------------------------------------------------------------------------+\n" <<
+	" | Incorrect input, my dear friend. Use -help or -h for usage information.  |\n" <<
+	" +--------------------------------------------------------------------------+\n";
 }
 
 void help()
 {
 	std::cout << std::endl << 
-	" +--------------------------------------------------------------------------+\n" <<
-	" |                   Simple Yggdrasil address miner usage                   |\n" <<
-	" +--------------------------------------------------------------------------+\n" <<
-	" High addresses mining                  -high <start position> <loglevel 0/1>\n" <<
-	" # example: -high 1f 1           (start position 21f:*, logging to text file)\n" <<
-	" IPv6 pattern mining                      -ippattern <pattern> <loglevel 0/1>\n" <<
-	" # example: -ippattern ace 0                 (search \"ace\", console log only)\n" <<
-	" IPv6 pattern&high mining     -pahi <pattern> <start position> <loglevel 0/1>\n" <<
-	" # example: -pahi ace 1a 0      (search \"ace\", start 21a:*, console log only)\n" <<
-	" IPv6 regexp mining                          -ipregex <regexp> <loglevel 0/1>\n" <<
-	" # example: -ipregex ^20[5-7].*.a$ 1        (search and logging to text file)\n" <<
-	" Meshname pattern mining                -meshpattern <pattern> <loglevel 0/1>\n" <<
-	" # example: -meshpattern acetone 0       (search \"acetone\", console log only)\n" <<
-	" Meshname regexp mining                    -meshregex <regexp> <loglevel 0/1>\n" <<
-	" # example: -meshregex ^aimbot 1            (search and logging to text file)\n" <<
-	" Subnet brute force mining                       -brute <IPv6> <loglevel 0/1>\n" <<
-	" # example: -brute 300:b24b:: 0      (search subnet and logging to text file)\n" <<
-	" ----------------------------------------------------------------------------\n" <<
-	" Convert IP to Meshname                                        -tomesh <IPv6>\n" <<
-	" Convert Meshname to IP                                        -toip <domain>\n";
+	" +--------------------------------------------------------------------------+\n"   <<
+	" |                   Simple Yggdrasil address miner usage                   |\n"   <<
+	" +--------------------------------------------------------------------------+\n"   <<
+	" High addresses mining                 -high <start position> <threads count>\n"   <<
+	"   example: -high 1f 1                       (start position 21f:*, 1 thread)\n"   <<
+	" IPv6 pattern mining                     -ippattern <pattern> <threads count>\n"   <<
+	"   example: -ippattern ace 2                        (search \"ace\", 2 threads)\n" <<
+	" IPv6 pattern & high mining  -pahi <pattern> <start position> <threads count>\n"   <<
+	"   example: -pahi ace 1a 4             (search \"ace\", start 21a:*, 4 threads)\n" <<
+	" IPv6 regexp mining                         -ipreg \"<regexp>\" <threads count>\n" <<
+	"   example: -ipreg   \"^20[10-15].*.:a$\" 16               (search, 16 threads)\n" <<
+	" Meshname pattern mining               -meshpattern <pattern> <threads count>\n"   <<
+	"   example: -meshpattern acetone 8              (search \"acetone\", 8 threads)\n" <<
+	" Meshname regexp mining                   -meshreg \"<regexp>\" <threads count>\n" <<
+	"   example: -meshreg \"^aimbot\" 1                           (search, 1 thread)\n" <<
+	" Subnet brute force mining                      -brute <IPv6> <threads count>\n"   <<
+	"   example: -brute 300:b24b:: 4                    (search subnet, 4 threads)\n"   <<
+	" +--------------------------------------------------------------------------+\n"   <<
+	" Convert IP to Meshname                                        -tomesh <IPv6>\n"   <<
+	" Convert Meshname to IP                                        -toip <domain>\n"   <<
+	" +--------------------------------------------------------------------------+\n"   <<
+	" [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n"   <<
+	" [!] In meshname domain use \"=\" or \"===\" instead \".meshname\".          \n"   <<
+	" [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n"   <<
+	" +--------------------------------------------------------------------------+\n"   <<
+	" ALSO YOU CAN USE CONFIGURATION FILE INSTEAD PASSED PARAMETERS. JUST RUN SYG.\n";
 	
 }
 
@@ -513,9 +540,11 @@ int main(int argc, char *argv[])
 	return 0;
 #endif
 	
-	if(argv[1] != nullptr) // Доп. функции конвертации адресов
+	std::string p1;
+	if(argv[1] != nullptr) 
 	{
-		std::string p1 = argv[1];
+		///////////////////////////////// Доп. функции конвертации адресов
+		p1 = argv[1];
 		if (p1 == "-help" || p1 == "-h") {
 			help();
 			return 0;
@@ -533,37 +562,99 @@ int main(int argc, char *argv[])
 				decodeMeshToIP(argv[2]) << std::endl;
 				return 0;
 			} else { error(); return -502; }
+		} 
+		
+		///////////////////////////////// Штатные функции
+		  else if (p1 == "-high") { // high mining
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 1;
+				std::istringstream ss(argv[2]);
+				ss >> std::hex >> conf.high;
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -503; }
+		} else if (p1 == "-ippattern") { // IPv6 pattern mining
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 0;
+				conf.str_search = argv[2];
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -504; }
+		} else if (p1 == "-pahi") { // pattern & high mining
+			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
+				conf.mode = 2;
+				conf.str_search = argv[2];
+				std::istringstream ss(argv[3]);
+				ss >> std::hex >> conf.high;
+				conf.proc = std::stoi(argv[4]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -505; }
+		} else if (p1 == "-ipreg") { // IPv6 regexp mining
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 3;
+				conf.rgx_search = argv[2];
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -506; }
+		} else if (p1 == "-meshpattern") { // meshname pattern mining
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 4;
+				conf.str_search = argv[2];
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -507; }
+		} else if (p1 == "-meshreg") { // meshname regexp mining
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 5;
+				conf.rgx_search = argv[2];
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -508; }
+		} else if (p1 == "-brute") { // subnet brute force
+			if (argv[2] != nullptr && argv[3] != nullptr) {
+				conf.mode = 6;
+				conf.str_search = argv[2];
+				conf.proc = std::stoi(argv[3]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -509; }
+		} else {error(); return -510;} // Первый параметр - неверный
+		
+	} else { // Запуск без параметров, работа с конфигом
+	
+		Intro();
+		int configcheck = config(); // функция получения конфигурации
+		if(configcheck < 0)
+		{
+			std::cerr << " Error code: " << configcheck;
+			std::this_thread::sleep_for(std::chrono::seconds(15));
+			return configcheck;
 		}
+		DisplayConfig();
+		testoutput();
+		startThreads();
 	}
 	
-	Intro();
-	
-	int configcheck = config(); // функция получения конфигурации
-	if(configcheck < 0)
-	{
-		std::cerr << " Error code: " << configcheck;
-		std::this_thread::sleep_for(std::chrono::seconds(15));
-		return configcheck;
-	}
-	
-	DisplayConfig();
-	testoutput();
-	
-	std::thread* lastThread;
-	for (int i = 0; i < conf.proc; i++)
-	{
-		lastThread = new std::thread(
-			conf.mode == 0 ? miner_thread<0> : 
-			conf.mode == 1 ? miner_thread<1> : 
-			conf.mode == 2 ? miner_thread<2> :
-			conf.mode == 3 ? miner_thread<3> :
-			conf.mode == 4 ? miner_thread<4> :
-			conf.mode == 5 ? miner_thread<5> :
-			miner_thread<6> 
-		);
-	}
-	lastThread->join();
-
 	std::cerr << "SYG has stopped working unexpectedly! Please, report about this.";
 	std::this_thread::sleep_for(std::chrono::seconds(15));
 	return -420;

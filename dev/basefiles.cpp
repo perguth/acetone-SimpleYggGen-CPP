@@ -2,7 +2,7 @@ struct option
 {
 	int proc = 0;
 	int mode = 0;
-	int log  = 0;
+	int log  = 1;
 	int high = 0;
 	int mesh = 0;
 	std::string str_search;
@@ -10,7 +10,7 @@ struct option
 	std::string outputfile;
 	
 	uint8_t raw_search[16];
-	int raw_size = 7; // 64 бита / 8 = 8 байт, нумерация с нуля => -1
+	int sbt_size = 7; // 64 бита / 8 = 8 байт, нумерация с нуля => -1
 	bool sbt_alarm = false; // для симпатичного вывода предупреждения
 };
 
@@ -46,12 +46,12 @@ int config()
 				<< "* Start position (2xx): 14\n\n"
 				<< "  Used when \"Mining option\" set as 0, 2, 4 or 6.\n"
 				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
-				<< "  - In meshname domain, use \"===\" instead \".meshname\".\n"
+				<< "  - In meshname domain use \"===\" instead \".meshname\".\n"
 				<< "  - Subnet brute force understand \"3xx:\" and \"2xx:\" patterns.\n"
 				<< "* Pattern: ::\n\n"
 				<< "  Used when \"Mining option\" set as 3 or 5. Extended grep type.\n"
 				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
-				<< "  - In meshname domain, use \"===\" instead \".meshname\".\n"
+				<< "  - In meshname domain use \"===\" instead \".meshname\".\n"
 				<< "* Regexp: ^2.*.f{1,4}.*.ace:(6|9)$\n\n"
 				<< "  0 - disable, 1 - enable.\n"
 				<< "* Display meshname domains: 0";
@@ -167,16 +167,22 @@ int config()
 			return -9;
 		}
 
-		unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
-		if (conf.proc > (int)processor_count)
-			conf.proc = (int)processor_count;
-		countsize = 800 << __bsrq(conf.proc);
+// 		unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
+// 		if (conf.proc > (int)processor_count)
+// 			conf.proc = (int)processor_count;
+// 		countsize = 800 << __bsrq(conf.proc);
 	}
 	return 0;
 }
 
 void DisplayConfig()
 {
+	// из-за регулирования количества потоков и countsize вызов функции обязателен
+	unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
+	if (conf.proc > (int)processor_count)
+		conf.proc = (int)processor_count;
+	countsize = 800 << __bsrq(conf.proc);
+	
 	std::cout << " Threads: " << conf.proc << ", ";
 
 	if(conf.mode == 0)
