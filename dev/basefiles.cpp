@@ -1,4 +1,4 @@
-struct option 
+﻿struct option 
 {
 	int proc = 0;
 	int mode = 0;
@@ -166,11 +166,6 @@ int config()
 			std::cerr << " Corrupted configuration file. Some parameters not found." << std::endl;
 			return -9;
 		}
-
-// 		unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
-// 		if (conf.proc > (int)processor_count)
-// 			conf.proc = (int)processor_count;
-// 		countsize = 800 << __bsrq(conf.proc);
 	}
 	return 0;
 }
