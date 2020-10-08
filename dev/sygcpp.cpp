@@ -1,4 +1,4 @@
-/**
+﻿/**
  *
  * IRC: irc.ilita.i2p port 6667 || 303:60d4:3d32:a2b9::3 port 16667
  * general channels: #ru and #howtoygg
@@ -514,7 +514,7 @@ void help()
 	" IPv6 pattern & high mining  -pahi <pattern> <start position> <threads count>\n"   <<
 	"   example: -pahi ace 1a 4             (search \"ace\", start 21a:*, 4 threads)\n" <<
 	" IPv6 regexp mining                         -ipreg \"<regexp>\" <threads count>\n" <<
-	"   example: -ipreg   \"^20[10-15].*.:a$\" 16               (search, 16 threads)\n" <<
+	"   example: -ipreg \"^20[10-15].*.:a$\" 16                 (search, 16 threads)\n" <<
 	" Meshname pattern mining               -meshpattern <pattern> <threads count>\n"   <<
 	"   example: -meshpattern acetone 8              (search \"acetone\", 8 threads)\n" <<
 	" Meshname regexp mining                   -meshreg \"<regexp>\" <threads count>\n" <<
