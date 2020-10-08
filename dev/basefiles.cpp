@@ -9,9 +9,9 @@ struct option
 	std::string rgx_search;
 	std::string outputfile;
 	
-	uint8_t raw_search[46];
+	uint8_t raw_search[16];
 	int raw_size = 7; // 64 бита / 8 = 8 байт, нумерация с нуля => -1
-	bool raw_alarm = false; // для симпатичного вывода предупреждения
+	bool sbt_alarm = false; // для симпатичного вывода предупреждения
 };
 
 option conf;
@@ -46,10 +46,12 @@ int config()
 				<< "* Start position (2xx): 14\n\n"
 				<< "  Used when \"Mining option\" set as 0, 2, 4 or 6.\n"
 				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
+				<< "  - In meshname domain, use \"===\" instead \".meshname\".\n"
 				<< "  - Subnet brute force understand \"3xx:\" and \"2xx:\" patterns.\n"
 				<< "* Pattern: ::\n\n"
 				<< "  Used when \"Mining option\" set as 3 or 5. Extended grep type.\n"
-				<< "  - When searching meshname domain, don't need use \".meshname\".\n"
+				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
+				<< "  - In meshname domain, use \"===\" instead \".meshname\".\n"
 				<< "* Regexp: ^2.*.f{1,4}.*.ace:(6|9)$\n\n"
 				<< "  0 - disable, 1 - enable.\n"
 				<< "* Display meshname domains: 0";
@@ -192,7 +194,7 @@ void DisplayConfig()
 	else if(conf.mode == 5)
 		std::cout << "meshname regexp (" << conf.rgx_search << "), ";
 	else if(conf.mode == 6)
-		std::cout << "subnet brute force (" << conf.str_search << "), ";
+		std::cout << "subnet brute force (" << conf.str_search << "/64), ";
 	
 	if(conf.log)
 		std::cout << "logging to text file.";

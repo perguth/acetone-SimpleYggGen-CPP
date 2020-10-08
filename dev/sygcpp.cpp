@@ -35,7 +35,7 @@
 
 #include "x25519.h"
 #include "sha512.h"
-#include "cppcodec/base32_rfc4648.hpp"
+#include "cppcodec/base32_rfc4648.hpp" 
 
 #define BLOCKSIZE 10000
 
@@ -126,12 +126,70 @@ std::string getMeshname(const uint8_t * rawAddr)
 	return std::string(cppcodec::base32_rfc4648::encode(rawAddr, 16));
 }
 
-bool convertStrToRaw()
+/**
+ * pickupStringForMeshname получает человекочитаемую строку
+ * типа fsdasdaklasdgdas.meshname и возвращает значение, пригодное
+ * для поиска по meshname-строке: удаляет возможную доменную зону
+ * (всё после точки и саму точку), а также делает все буквы
+ * заглавными.
+ */
+std::string pickupStringForMeshname(std::string str)
+{
+	bool dot = false;
+	std::string::iterator delend;
+	for (auto it = str.begin(); it != str.end(); it++)
+	{
+		// делаем все буквы заглавными для обработки
+		*it = toupper(*it);
+		if(*it == '.') {
+			delend = it;
+			dot = true;
+		}
+	}
+	if(dot)
+		for (auto it = str.end(); it != delend; it--)
+			str.pop_back(); // удаляем доменную зону
+	return str;
+}
+
+/**
+ * pickupMeshnameForOutput получает сырое base32 значение
+ * типа KLASJFHASSA7979====== и возвращает meshname-домен:
+ * делает все символы строчными и удаляет паддинги ('='),
+ * а также добавляет доменную зону ".meshname".
+ */
+std::string pickupMeshnameForOutput(std::string str)
+{
+	for (auto it = str.begin(); it != str.end(); it++) // делаем все буквы строчными для вывода
+		*it = tolower(*it);
+	for (auto it = str.end(); *(it-1) == '='; it--)
+		str.pop_back(); // удаляем символы '=' в конце адреса
+	return str + ".meshname";
+}
+
+/**
+ * decodeMeshToIP получает строковое значение сырого base32
+ * кода типа KLASJFHASSA7979====== и возвращает IPv6-стринг.
+ */
+std::string decodeMeshToIP(const std::string str)
+{
+	std::string mesh = pickupStringForMeshname(str) + "======"; // 6 паддингов - норма для IPv6 адреса
+	std::vector<uint8_t> raw = cppcodec::base32_rfc4648::decode(mesh);
+	uint8_t rawAddr[16];
+	for(int i = 0; i < 16; ++i)
+		rawAddr[i] = raw[i];
+	return std::string(getAddress(rawAddr));
+}
+
+void subnetCheck()
 {
 	if(conf.str_search[0] == '3') // замена 300::/64 на целевой 200::/7
-		conf.str_search[0] = '2';
+	conf.str_search[0] = '2';
+}
 
-	bool result = inet_pton(AF_INET6, conf.str_search.c_str(), (void*)conf.raw_search);
+bool convertStrToRaw(std::string str, uint8_t * array)
+{
+	bool result = inet_pton(AF_INET6, str.c_str(), (void*)array);
 	return result;
 }
 
@@ -182,8 +240,10 @@ void logKeys(uint8_t * raw, const key25519 publicKey, const key25519 privateKey)
 		std::cout << std::endl;
 		newline = false;
 	}
-	if (conf.mesh)
-		std::cout << " Domain:     " << getMeshname(raw) + ".meshname" << std::endl;
+	if (conf.mesh) {
+		std::string mesh = getMeshname(raw);
+		std::cout << " Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
+	}
 	std::cout << " Address:    " << getAddress(raw) << std::endl;
 	std::cout << " PublicKey:  " << keyToString(publicKey) << std::endl;
 	std::cout << " PrivateKey: " << keyToString(privateKey) << std::endl;
@@ -193,8 +253,10 @@ void logKeys(uint8_t * raw, const key25519 publicKey, const key25519 privateKey)
 	{
 		std::ofstream output(conf.outputfile, std::ios::app);
 		output << std::endl;
-		if (conf.mesh)
-			output << "Domain:               " << getMeshname(raw) + ".meshname" << std::endl;
+		if (conf.mesh) {
+		std::string mesh = getMeshname(raw);
+		output << "Domain:               " << pickupMeshnameForOutput(mesh) << std::endl;
+		}
 		output << "Address:              " << getAddress(raw) << std::endl;
 		output << "EncryptionPublicKey:  " << keyToString(publicKey) << std::endl;
 		output << "EncryptionPrivateKey: " << keyToString(privateKey) << std::endl;
@@ -228,23 +290,29 @@ void miner_thread()
 	keys_block block(BLOCKSIZE);
 	uint8_t random_bytes[KEYSIZE];
 	uint8_t sha512_hash[crypto_hash_sha512_BYTES];
+
+	if (T == 4 || T == 5) // meshname pattern
+	{
+		std::string tmp = pickupStringForMeshname(conf.str_search);
+		conf.str_search = tmp;
+		
+		for (auto it = conf.rgx_search.begin(); it != conf.rgx_search.end(); it++)
+			*it = toupper(*it);
+	} 
 	std::regex regx(conf.rgx_search, std::regex_constants::egrep);
-	
 	if (T == 6) // subnet brute force
 	{
 		mtx.lock();
-		if(!conf.raw_alarm) 
+		if(!conf.sbt_alarm) // однократный вывод ошибки
 		{
-			bool result = convertStrToRaw();
+			subnetCheck();
+			bool result = convertStrToRaw(conf.str_search, conf.raw_search);
 			if(!result || (conf.str_search != getAddress(conf.raw_search)))
 			{
-				std::cerr << " +--------------------------------------------------------------------------+" << std::endl << 
-				             " |                  Warning! Address convertation trouble.                  |" << std::endl <<
-				             " +--------------------------------------------------------------------------+" << std::endl << 
-							 " STRING [ " << conf.str_search << " ] >> ADDRESS [ " << getAddress(conf.raw_search) << " ]" 
-							 << std::endl << std::endl;
+				std::cerr << " WARNING: Your string [" << conf.str_search << "] converted to IP [" << 
+				getAddress(conf.raw_search) << "]" << std::endl << std::endl;
 			}
-			conf.raw_alarm = true;
+			conf.sbt_alarm = true;
 		}
 		mtx.unlock();
 	}
@@ -407,15 +475,69 @@ void selfCheck()
 #endif // debug
 
 // ------------------------------------------------------
-int main()
+void error()
 {
-	Intro();
+	std::cerr << "\n Incorrect input. Use -help, bro.\n";
+}
 
+void help()
+{
+	std::cout << std::endl << 
+	" +--------------------------------------------------------------------------+\n" <<
+	" |                   Simple Yggdrasil address miner usage                   |\n" <<
+	" +--------------------------------------------------------------------------+\n" <<
+	" High addresses mining                  -high <start position> <loglevel 0/1>\n" <<
+	" # example: -high 1f 1           (start position 21f:*, logging to text file)\n" <<
+	" IPv6 pattern mining                      -ippattern <pattern> <loglevel 0/1>\n" <<
+	" # example: -ippattern ace 0                 (search \"ace\", console log only)\n" <<
+	" IPv6 pattern&high mining     -pahi <pattern> <start position> <loglevel 0/1>\n" <<
+	" # example: -pahi ace 1a 0      (search \"ace\", start 21a:*, console log only)\n" <<
+	" IPv6 regexp mining                          -ipregex <regexp> <loglevel 0/1>\n" <<
+	" # example: -ipregex ^20[5-7].*.a$ 1        (search and logging to text file)\n" <<
+	" Meshname pattern mining                -meshpattern <pattern> <loglevel 0/1>\n" <<
+	" # example: -meshpattern acetone 0       (search \"acetone\", console log only)\n" <<
+	" Meshname regexp mining                    -meshregex <regexp> <loglevel 0/1>\n" <<
+	" # example: -meshregex ^aimbot 1            (search and logging to text file)\n" <<
+	" Subnet brute force mining                       -brute <IPv6> <loglevel 0/1>\n" <<
+	" # example: -brute 300:b24b:: 0      (search subnet and logging to text file)\n" <<
+	" ----------------------------------------------------------------------------\n" <<
+	" Convert IP to Meshname                                        -tomesh <IPv6>\n" <<
+	" Convert Meshname to IP                                        -toip <domain>\n";
+	
+}
+
+int main(int argc, char *argv[])
+{
 #ifdef SELF_CHECK
 	selfCheck();
 	return 0;
 #endif
-
+	
+	if(argv[1] != nullptr) // Доп. функции конвертации адресов
+	{
+		std::string p1 = argv[1];
+		if (p1 == "-help" || p1 == "-h") {
+			help();
+			return 0;
+		} else if (p1 == "-tomesh") { // преобразование IP -> Meshname
+			if (argv[2] != nullptr) {
+				convertStrToRaw(argv[2], conf.raw_search);
+				std::string mesh = getMeshname(conf.raw_search);
+				std::cout << std::endl <<
+				pickupMeshnameForOutput(mesh) << std::endl;
+				return 0;
+			} else { error(); return -501; }
+		} else if (p1 == "-toip") { // преобразование Meshname -> IP
+			if (argv[2] != nullptr) {
+				std::cout << std::endl <<
+				decodeMeshToIP(argv[2]) << std::endl;
+				return 0;
+			} else { error(); return -502; }
+		}
+	}
+	
+	Intro();
+	
 	int configcheck = config(); // функция получения конфигурации
 	if(configcheck < 0)
 	{

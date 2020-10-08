@@ -57,25 +57,17 @@ struct padder {
     CPPCODEC_ALWAYS_INLINE void operator()(Result&, ResultState&, EncodedBlockSizeT) { }
 };
 
-/* 
- * Почему закомментировано?
-
-	template<> // specialization for CodecVariant::generates_padding() == true
-	struct padder<true> {
-		template <typename CodecVariant, typename Result, typename ResultState, typename EncodedBlockSizeT>
-		CPPCODEC_ALWAYS_INLINE void operator()(
-				Result& encoded, ResultState& state, EncodedBlockSizeT num_padding_characters)
-		{
-			for (EncodedBlockSizeT i = 0; i < num_padding_characters; ++i) {
-				data::put(encoded, state, CodecVariant::padding_symbol());
-			}
-		}
-	};
-	
- * Потому что паддинги (знаки '=') в конце мешнейма нам не нужны. 
- * И вообще, как ты добрался сюда? 
- * С любовью из 2020, acetone.
-*/ 
+template<> // specialization for CodecVariant::generates_padding() == true
+struct padder<true> {
+    template <typename CodecVariant, typename Result, typename ResultState, typename EncodedBlockSizeT>
+    CPPCODEC_ALWAYS_INLINE void operator()(
+            Result& encoded, ResultState& state, EncodedBlockSizeT num_padding_characters)
+    {
+        for (EncodedBlockSizeT i = 0; i < num_padding_characters; ++i) {
+            data::put(encoded, state, CodecVariant::padding_symbol());
+        }
+    }
+};
 
 template <size_t I>
 struct enc {

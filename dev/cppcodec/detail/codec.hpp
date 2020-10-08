@@ -173,8 +173,7 @@ inline void codec<CodecImpl>::encode(
 
     CodecImpl::encode(encoded_result, state, binary, binary_size);
     data::finish(encoded_result, state);
-    // assert(data::size(encoded_result) == encoded_buffer_size); 
-	// информация >>> stream_codec.hpp, 60 строка
+    assert(data::size(encoded_result) == encoded_buffer_size);
 }
 
 template <typename CodecImpl>

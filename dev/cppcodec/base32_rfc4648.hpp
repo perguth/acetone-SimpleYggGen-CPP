@@ -33,8 +33,8 @@ namespace detail {
 
 // RFC 4648 uses a simple alphabet: A-Z starting at index 0, then 2-7 starting at index 26.
 static constexpr const char base32_rfc4648_alphabet[] = {
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', // at index 26
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', // at index 26
     '2', '3', '4', '5', '6', '7'
 };
 
