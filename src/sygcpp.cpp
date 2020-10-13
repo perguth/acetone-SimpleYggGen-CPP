@@ -19,7 +19,6 @@
 #include <sstream>
 #include <fstream>       // файловые потоки
 #include <iomanip>       // форматированный вывод строк
-#include <bitset>        // побитовое чтение
 #include <vector>
 #include <thread>        // многопоточность
 #include <mutex>         // блокирование данных при многопоточности
@@ -184,7 +183,7 @@ std::string decodeMeshToIP(const std::string str)
 void subnetCheck()
 {
 	if(conf.str_search[0] == '3') // замена 300::/64 на целевой 200::/7
-	conf.str_search[0] = '2';
+		conf.str_search[0] = '2';
 }
 
 bool convertStrToRaw(std::string str, uint8_t * array)
