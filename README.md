@@ -5,7 +5,7 @@ Wiki (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/do
 
 ```
 IRC Chat:
-Yggdrasil   324:9de3:fea4:f6ac::ace   16677   TCP
+Yggdrasil   324:9de3:fea4:f6ac::41   6667   TCP
 General channels: #howtoygg and #ru
 
 Mumble (voice chat):
