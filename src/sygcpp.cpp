@@ -39,7 +39,7 @@
 #define BLOCKSIZE 10000
 
 // Если раскомментировано, высота адресов при майнинге не будет увеличиваться
-#define DISABLE_INCREASE
+// #define DISABLE_INCREASE
 
 void Intro()
 {
