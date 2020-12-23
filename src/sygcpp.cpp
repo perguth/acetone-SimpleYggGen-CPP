@@ -1,6 +1,6 @@
 ﻿/**
  *
- * IRC: irc.ilita.i2p port 6667 || 303:60d4:3d32:a2b9::3 port 16667
+ * IRC: irc.acetone.i2p port 6667 || 324:9de3:fea4:f6ac::41 port 6667
  * general channels: #ru and #howtoygg
  *
  * acetone (default) git: notabug.org/acetone/SimpleYggGen-CPP
@@ -38,14 +38,15 @@
 
 #define BLOCKSIZE 10000
 
-//#define SELF_CHECK // debug
+// Если раскомментировано, высота адресов при майнинге не будет увеличиваться
+#define DISABLE_INCREASE
 
 void Intro()
 {
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                   [ SimpleYggGen C++ 3.4-subnetlover ]                   |" << std::endl <<
+		" |                   [ SimpleYggGen C++ 3.4.1-          ]                   |" << std::endl <<
 		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
@@ -357,7 +358,10 @@ void miner_thread()
 			{
 				if (newones > conf.high)
 				{
+					#ifndef DISABLE_INCREASE
 					conf.high = newones;
+					#endif 
+					
 					fortune_key_index = i;
 				}
 			}
@@ -368,7 +372,10 @@ void miner_thread()
 				if (newones > conf.high && getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos)
 				{
+					#ifndef DISABLE_INCREASE
 					conf.high = newones;
+					#endif 
+					
 					fortune_key_index = i;
 					break;
 				}
@@ -383,7 +390,24 @@ void miner_thread()
 					break;
 				}
 			}
-			if (T == 4) // meshname pattern mining
+			if (T == 4) // meshname & high
+			{
+				uint8_t rawAddr[16];
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
+				if (newones > conf.high)
+				{
+					if (std::regex_search((getAddress(rawAddr)), regx))
+					{
+						#ifndef DISABLE_INCREASE
+						conf.high = newones;
+						#endif 
+						
+						fortune_key_index = i;
+						break;
+					}
+				}
+			}
+			if (T == 5) // meshname pattern mining
 			{
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
@@ -394,7 +418,7 @@ void miner_thread()
 					break;
 				}
 			}
-			if (T == 5) // meshname regexp mining
+			if (T == 6) // meshname regexp mining
 			{
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
@@ -404,10 +428,10 @@ void miner_thread()
 					break;
 				}
 			}
-			if (T == 6) // subnet brute force
+			if (T == 7) // subnet brute force
 			{
 				uint8_t rawAddr[16];
-				getRawAddress(newones, sha512_hash, rawAddr);
+				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				for(int z = 0; conf.raw_search[z] == rawAddr[z]; ++z)
 				{
 					if (z == conf.sbt_size)
@@ -424,60 +448,10 @@ void miner_thread()
 	}
 }
 
-#ifdef SELF_CHECK // debug
-void selfCheck()
-{
-	std::cout << "Self-check started." << std::endl;
-
-	for (int i = 0; i < 16; i++)
-	{
-		int block_size = 1 << i;
-
-		keys_block block(block_size);
-		uint8_t random_bytes[KEYSIZE];
-		randombytes(random_bytes, KEYSIZE);
-		block.calculate_public_keys(random_bytes);
-
-		key25519 public_key1;
-		key25519 public_key2;
-		key25519 private_key;
-		uint8_t sha512_hash1[crypto_hash_sha512_BYTES];
-		uint8_t sha512_hash2[crypto_hash_sha512_BYTES];
-		for (int j = 0; j < block_size; j++)
-		{
-			block.get_public_key(public_key1, j);
-			block.get_private_key(private_key, j);
-			crypto_scalarmult_curve25519_base(public_key2, private_key);
-			crypto_hash_sha512(sha512_hash1, public_key2);
-			crypto_hash_sha512(sha512_hash2, public_key2, KEYSIZE);
-			if (memcmp(public_key1, public_key2, KEYSIZE) != 0 ||
-				memcmp(sha512_hash1, sha512_hash2, crypto_hash_sha512_BYTES))
-			{
-				std::cout << "!!! Self-check failed !!!" << std::endl;
-				std::cout << " PrivateKey:  " << keyToString(private_key) << std::endl;
-				std::cout << " PublicKey1:  " << keyToString(public_key1) << std::endl;
-				std::cout << " PublicKey2:  " << keyToString(public_key2) << std::endl;
-				std::cout << " SHA512Hash1: " << hashToString(sha512_hash1) << std::endl;
-				std::cout << " SHA512Hash2: " << hashToString(sha512_hash2) << std::endl;
-				std::cout << "!!! Self-check failed !!!" << std::endl;
-				return;
-			}
-			else
-			{
-				//std::cout << "    Self-check ok" << std::endl;
-				//std::cout << " PrivateKey: " << keyToString(private_key) << std::endl;
-			}
-		}
-	}
-	std::cout << "Self-check finished." << std::endl;
-}
-#endif // debug
-
-// ------------------------------------------------------
 void startThreads()
 {
 	std::thread* lastThread;
-	for (int i = 0; i < conf.proc; i++)
+	for (int i = 0; i < conf.proc; ++i)
 	{
 		lastThread = new std::thread(
 			conf.mode == 0 ? miner_thread<0> : 
@@ -486,7 +460,8 @@ void startThreads()
 			conf.mode == 3 ? miner_thread<3> :
 			conf.mode == 4 ? miner_thread<4> :
 			conf.mode == 5 ? miner_thread<5> :
-			miner_thread<6> 
+			conf.mode == 6 ? miner_thread<6> :
+			miner_thread<7>
 		);
 	}
 	lastThread->join();
@@ -534,11 +509,6 @@ void help()
 
 int main(int argc, char *argv[])
 {
-#ifdef SELF_CHECK
-	selfCheck();
-	return 0;
-#endif
-	
 	std::string p1;
 	if(argv[1] != nullptr) 
 	{
@@ -609,7 +579,7 @@ int main(int argc, char *argv[])
 			} else { error(); return -506; }
 		} else if (p1 == "-meshpattern") { // meshname pattern mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 4;
+				conf.mode = 5;
 				conf.str_search = argv[2];
 				conf.proc = std::stoi(argv[3]);
 				Intro();
@@ -619,7 +589,7 @@ int main(int argc, char *argv[])
 			} else { error(); return -507; }
 		} else if (p1 == "-meshreg") { // meshname regexp mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 5;
+				conf.mode = 6;
 				conf.rgx_search = argv[2];
 				conf.proc = std::stoi(argv[3]);
 				Intro();
@@ -629,7 +599,7 @@ int main(int argc, char *argv[])
 			} else { error(); return -508; }
 		} else if (p1 == "-brute") { // subnet brute force
 			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 6;
+				conf.mode = 7;
 				conf.str_search = argv[2];
 				conf.proc = std::stoi(argv[3]);
 				Intro();

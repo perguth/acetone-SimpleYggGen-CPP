@@ -36,20 +36,20 @@ int config()
 				<< "####################################################################\n\n"
 				<< "  Parameter limited by processors count on PC.\n"
 				<< "* Count of thread: 16\n\n"
-				<< "  0 - IPv6 pattern, 1 - high address, 2 - search by pattern & high,\n"
-				<< "  3 - IPv6 regexp, 4 - meshname pattern, 5 - meshname regexp,\n"
-				<< "  6 - IPv6 subnet brute force mode :^)\n"
+				<< "  0 - IPv6 pattern, 1 - high address, 2 - IPv6 pattern & high,\n"
+				<< "  3 - IPv6 regexp, 4 - IPv6 regex & high, 5 - meshname pattern,\n"
+				<< "  6 - meshname regexp, 7 - IPv6 subnet brute force mode :^)\n"
 				<< "* Mining option: 1\n\n"
 				<< "  0 - console output only, 1 - log to file.\n"
 				<< "* Logging mode: 1\n\n"
 				<< "  High address search. Parameter is set in hexadecimal (0-9, a-f).\n"
 				<< "* Start position (2xx): 14\n\n"
-				<< "  Used when \"Mining option\" set as 0, 2, 4 or 6.\n"
+				<< "  Used when \"Mining option\" set as 0, 2, 5 or 7.\n"
 				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
 				<< "  - In meshname domain use \"===\" instead \".meshname\".\n"
 				<< "  - Subnet brute force understand \"3xx:\" and \"2xx:\" patterns.\n"
 				<< "* Pattern: ::\n\n"
-				<< "  Used when \"Mining option\" set as 3 or 5. Extended grep type.\n"
+				<< "  Used when \"Mining option\" set as 3, 4 or 5. Extended grep type.\n"
 				<< "  - Meshname domains use base32 (RFC4648) alphabet symbols.\n"
 				<< "  - In meshname domain use \"===\" instead \".meshname\".\n"
 				<< "* Regexp: ^2.*.f{1,4}.*.ace:(6|9)$\n\n"
@@ -183,18 +183,21 @@ void DisplayConfig()
 	if(conf.mode == 0)
 		std::cout << "IPv6 pattern (" << conf.str_search << "), ";
 	else if(conf.mode == 1)
-		std::cout << "search high addresses (2" << std::setw(2) << std::setfill('0') << 
+		std::cout << "high addresses (2" << std::setw(2) << std::setfill('0') << 
 			std::hex << conf.high << std::dec << "+), ";
 	else if(conf.mode == 2)
-		std::cout << "search by pattern & high (" << conf.str_search << " & 2" << 
+		std::cout << "by pattern & high (" << conf.str_search << " & 2" << 
  			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
 	else if(conf.mode == 3)
 		std::cout << "IPv6 regexp (" << conf.rgx_search << "), ";
 	else if(conf.mode == 4)
-		std::cout << "meshname pattern (" << conf.str_search << "), ";
+		std::cout << "IPv6 regexp & high (" << conf.rgx_search << " & 2" << 
+ 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
 	else if(conf.mode == 5)
-		std::cout << "meshname regexp (" << conf.rgx_search << "), ";
+		std::cout << "meshname pattern (" << conf.str_search << "), ";
 	else if(conf.mode == 6)
+		std::cout << "meshname regexp (" << conf.rgx_search << "), ";
+	else if(conf.mode == 7)
 		std::cout << "subnet brute force (" << conf.str_search << "/64), ";
 	
 	if(conf.log)
@@ -202,7 +205,7 @@ void DisplayConfig()
 	else
 		std::cout << "console log only.";
 
-	if((conf.mode == 4 || conf.mode == 5) && conf.mesh == 0)
+	if((conf.mode == 5 || conf.mode == 6) && conf.mesh == 0)
 		conf.mesh = 1; // принудительно включаем отображение мешнейм-доменов при их майнинге
 	std::cout << std::endl << std::endl;
 }
@@ -220,10 +223,12 @@ void testoutput()
 		else if(conf.mode == 3)
 			conf.outputfile = "syg-ipv6-regexp.txt";
 		else if(conf.mode == 4)
-			conf.outputfile = "syg-meshname-pattern.txt";
+			conf.outputfile = "syg-ipv6-regexp-high.txt";
 		else if(conf.mode == 5)
-			conf.outputfile = "syg-meshname-regexp.txt";
+			conf.outputfile = "syg-meshname-pattern.txt";
 		else if(conf.mode == 6)
+			conf.outputfile = "syg-meshname-regexp.txt";
+		else if(conf.mode == 7)
 			conf.outputfile = "syg-subnet-brute-force.txt";
 
 		std::ifstream test(conf.outputfile);
