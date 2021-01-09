@@ -3,11 +3,8 @@
  * IRC: irc.acetone.i2p port 6667 || 324:9de3:fea4:f6ac::41 port 6667
  * general channels: #ru and #howtoygg
  *
- * acetone (default) git: notabug.org/acetone/SimpleYggGen-CPP
- * Vort (member) git:     notabug.org/Vort/SimpleYggGen-CPP
- *
  * developers: Vort, acetone, R4SAS, lialh4, filarius, orignal
- * developers team, 2020 (c) GPLv3
+ * developers team, 2021 (c) GPLv3
  *
  */
 
@@ -38,19 +35,16 @@
 
 #define BLOCKSIZE 10000
 
-// Если раскомментировано, высота адресов при майнинге не будет увеличиваться
-// #define DISABLE_INCREASE
-
 void Intro()
 {
 	std::cout <<
 		std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                   [ SimpleYggGen C++ 3.4.1-          ]                   |" << std::endl <<
+		" |                   [ SimpleYggGen C++ 3.4.1-sweetassy ]                   |" << std::endl <<
 		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
 		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
 		" |                                                                          |" << std::endl <<
-		" |                              GPLv3 (c) 2020                              |" << std::endl <<
+		" |                              GPLv3 (c) 2021                              |" << std::endl <<
 		" +--------------------------------------------------------------------------+" << std::endl <<
 		std::endl;
 }
@@ -300,7 +294,7 @@ void miner_thread()
 			*it = toupper(*it);
 	} 
 	std::regex regx(conf.rgx_search, std::regex_constants::egrep);
-	if (T == 6) // subnet brute force
+	if (T == 7) // subnet brute force
 	{
 		mtx.lock();
 		if(!conf.sbt_alarm) // однократный вывод ошибки
@@ -358,10 +352,7 @@ void miner_thread()
 			{
 				if (newones > conf.high)
 				{
-					#ifndef DISABLE_INCREASE
-					conf.high = newones;
-					#endif 
-					
+					if (conf.letsup != 0) conf.high = newones;
 					fortune_key_index = i;
 				}
 			}
@@ -372,10 +363,7 @@ void miner_thread()
 				if (newones > conf.high && getAddress(rawAddr).find(
 					conf.str_search.c_str()) != std::string::npos)
 				{
-					#ifndef DISABLE_INCREASE
-					conf.high = newones;
-					#endif 
-					
+					if (conf.letsup != 0) conf.high = newones;
 					fortune_key_index = i;
 					break;
 				}
@@ -398,10 +386,7 @@ void miner_thread()
 				{
 					if (std::regex_search((getAddress(rawAddr)), regx))
 					{
-						#ifndef DISABLE_INCREASE
-						conf.high = newones;
-						#endif 
-						
+						if (conf.letsup != 0) conf.high = newones;
 						fortune_key_index = i;
 						break;
 					}
@@ -478,31 +463,33 @@ void error()
 void help()
 {
 	std::cout << std::endl << 
-	" +--------------------------------------------------------------------------+\n"   <<
-	" |                   Simple Yggdrasil address miner usage                   |\n"   <<
-	" +--------------------------------------------------------------------------+\n"   <<
-	" High addresses mining                 -high <start position> <threads count>\n"   <<
-	"   example: -high 1f 1                       (start position 21f:*, 1 thread)\n"   <<
-	" IPv6 pattern mining                     -ippattern <pattern> <threads count>\n"   <<
-	"   example: -ippattern ace 2                        (search \"ace\", 2 threads)\n" <<
-	" IPv6 pattern & high mining  -pahi <pattern> <start position> <threads count>\n"   <<
-	"   example: -pahi ace 1a 4             (search \"ace\", start 21a:*, 4 threads)\n" <<
-	" IPv6 regexp mining                         -ipreg \"<regexp>\" <threads count>\n" <<
-	"   example: -ipreg \"^20[10-15].*.:a$\" 16                 (search, 16 threads)\n" <<
-	" Meshname pattern mining               -meshpattern <pattern> <threads count>\n"   <<
-	"   example: -meshpattern acetone 8              (search \"acetone\", 8 threads)\n" <<
-	" Meshname regexp mining                   -meshreg \"<regexp>\" <threads count>\n" <<
-	"   example: -meshreg \"^aimbot\" 1                           (search, 1 thread)\n" <<
-	" Subnet brute force mining                      -brute <IPv6> <threads count>\n"   <<
-	"   example: -brute 300:b24b:: 4                    (search subnet, 4 threads)\n"   <<
-	" +--------------------------------------------------------------------------+\n"   <<
-	" Convert IP to Meshname                                        -tomesh <IPv6>\n"   <<
-	" Convert Meshname to IP                                        -toip <domain>\n"   <<
-	" +--------------------------------------------------------------------------+\n"   <<
-	" [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n"   <<
-	" [!] In meshname domain use \"=\" or \"===\" instead \".meshname\".          \n"   <<
-	" [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n"   <<
-	" +--------------------------------------------------------------------------+\n"   <<
+	" +--------------------------------------------------------------------------+\n"     <<
+	" |                   Simple Yggdrasil address miner usage                   |\n"     <<
+	" +--------------------------------------------------------------------------+\n"     <<
+	" High addresses mining                 -high <start position> <threads count>\n"     <<
+	"   example: -high 1f 1                       (start position 21f:*, 1 thread)\n\n"   <<
+	" IPv6 pattern mining                       -pattern <pattern> <threads count>\n"     <<
+	"   example: -pattern ace 2                        (search \"ace\", 2 threads)\n\n" <<
+	" IPv6 pattern & high mining    -ph <pattern> <start position> <threads count>\n"     <<
+	"   example: -ph ace 1a 4      (search \"ace\", start position 21a:*, 4 threads)\n\n" <<
+	" IPv6 regexp mining                        -regexp \"<regexp>\" <threads count>\n"   <<
+	"   example: -regexp \"^2[10-15].*.:a$\" 16                 (search, 16 threads)\n\n" <<
+	" IPv6 regexp & high mining   -rh \"<regexp>\" <start postition> <threads count>\n"   <<
+	"   example: -rh \":a{2,4}:.$\" 1a 4            (search, start 21a:*, 4 threads)\n\n" <<
+	" Meshname pattern mining               -meshpattern <pattern> <threads count>\n"     <<
+	"   example: -meshpattern acetone 8              (search \"acetone\", 8 threads)\n\n" <<
+	" Meshname regexp mining                -meshregexp \"<regexp>\" <threads count>\n"   <<
+	"   example: -meshregexp \"^aimbot\" 1                        (search, 1 thread)\n\n" <<
+	" Subnet brute force mining                      -brute <IPv6> <threads count>\n"     <<
+	"   example: -brute 300:b24b:: 4                    (search subnet, 4 threads)\n\n"   <<
+	" +--------------------------------------------------------------------------+\n"     <<
+	" Convert IP to Meshname                                        -tomesh <IPv6>\n"     <<
+	" Convert Meshname to IP                                        -toip <domain>\n"     <<
+	" +--------------------------------------------------------------------------+\n"     <<
+	" [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n"     <<
+	" [!] In meshname domain use \"=\" or \"===\" instead \".meshname\".          \n"     <<
+	" [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n"     <<
+	" +--------------------------------------------------------------------------+\n"     <<
 	" ALSO YOU CAN USE CONFIGURATION FILE INSTEAD PASSED PARAMETERS. JUST RUN SYG.\n";
 	
 }
@@ -545,7 +532,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -503; }
-		} else if (p1 == "-ippattern") { // IPv6 pattern mining
+		} else if (p1 == "-pattern") { // IPv6 pattern mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 0;
 				conf.str_search = argv[2];
@@ -555,7 +542,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -504; }
-		} else if (p1 == "-pahi") { // pattern & high mining
+		} else if (p1 == "-ph") { // pattern & high mining
 			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
 				conf.mode = 2;
 				conf.str_search = argv[2];
@@ -567,7 +554,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -505; }
-		} else if (p1 == "-ipreg") { // IPv6 regexp mining
+		} else if (p1 == "-regexp") { // IPv6 regexp mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 3;
 				conf.rgx_search = argv[2];
@@ -577,6 +564,18 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -506; }
+		} else if (p1 == "-rh") { // IPv6 regexp & high mining
+			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
+				conf.mode = 4;
+				conf.rgx_search = argv[2];
+				std::istringstream ss(argv[3]);
+				ss >> std::hex >> conf.high;
+				conf.proc = std::stoi(argv[4]);
+				Intro();
+				DisplayConfig();
+				testoutput();
+				startThreads();
+			} else { error(); return -507; }
 		} else if (p1 == "-meshpattern") { // meshname pattern mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 5;
@@ -586,8 +585,8 @@ int main(int argc, char *argv[])
 				DisplayConfig();
 				testoutput();
 				startThreads();
-			} else { error(); return -507; }
-		} else if (p1 == "-meshreg") { // meshname regexp mining
+			} else { error(); return -508; }
+		} else if (p1 == "-meshregexp") { // meshname regexp mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 6;
 				conf.rgx_search = argv[2];
@@ -596,7 +595,7 @@ int main(int argc, char *argv[])
 				DisplayConfig();
 				testoutput();
 				startThreads();
-			} else { error(); return -508; }
+			} else { error(); return -509; }
 		} else if (p1 == "-brute") { // subnet brute force
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 7;
@@ -606,8 +605,8 @@ int main(int argc, char *argv[])
 				DisplayConfig();
 				testoutput();
 				startThreads();
-			} else { error(); return -509; }
-		} else {error(); return -510;} // Первый параметр - неверный
+			} else { error(); return -510; }
+		} else {error(); return -511;} // Первый параметр - неверный
 		
 	} else { // Запуск без параметров, работа с конфигом
 	

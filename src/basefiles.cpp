@@ -1,10 +1,11 @@
 ﻿struct option 
 {
-	int proc = 0;
-	int mode = 0;
-	int log  = 1;
-	int high = 0;
-	int mesh = 0;
+	int  proc   = 0;    // количество потоков
+	int  mode   = 0;    // режим майнинга
+	bool log    = true; // логгирование 
+	int  high   = 0;    // начальная высота при майнинге
+	bool letsup = true; // повышение высоты при нахождении (булевое значение)
+	int  mesh   = 0;    // отображение meshname-доменов
 	std::string str_search;
 	std::string rgx_search;
 	std::string outputfile;
@@ -37,7 +38,7 @@ int config()
 				<< "  Parameter limited by processors count on PC.\n"
 				<< "* Count of thread: 16\n\n"
 				<< "  0 - IPv6 pattern, 1 - high address, 2 - IPv6 pattern & high,\n"
-				<< "  3 - IPv6 regexp, 4 - IPv6 regex & high, 5 - meshname pattern,\n"
+				<< "  3 - IPv6 regexp, 4 - IPv6 regexp & high, 5 - meshname pattern,\n"
 				<< "  6 - meshname regexp, 7 - IPv6 subnet brute force mode :^)\n"
 				<< "* Mining option: 1\n\n"
 				<< "  0 - console output only, 1 - log to file.\n"
@@ -54,7 +55,10 @@ int config()
 				<< "  - In meshname domain use \"===\" instead \".meshname\".\n"
 				<< "* Regexp: ^2.*.f{1,4}.*.ace:(6|9)$\n\n"
 				<< "  0 - disable, 1 - enable.\n"
-				<< "* Display meshname domains: 0";
+				<< "* Display meshname domains: 0\n\n"
+				<< "  When you mining in high mode, next address must be higher than\n"
+				<< "  previous. Set as 0, if you want disable auto-increase.\n"
+				<< "* Enable increase: 1";
 		newconf.close();
 		
 		std::ifstream conffile ("sygcpp.conf");
@@ -65,7 +69,7 @@ int config()
 	} else { // чтение конфигурации
 		std::string str_temp_read;
 		std::string str_read;
-		while(getline(conffile, str_temp_read))
+		while( getline(conffile, str_temp_read) )
 			str_read += str_temp_read;
 		conffile.close();
 		
@@ -76,12 +80,13 @@ int config()
 			bool log  = false;
 			bool high = false;
 			bool mesh = false;
+			bool letsup = false;
 			bool str_search = false;
 			bool rgx_search = false;
 			
 			bool ok()
 			{
-				return(proc & mode & log & high & mesh & str_search & rgx_search);
+				return(proc & mode & log & high & mesh & letsup & str_search & rgx_search);
 			}
 		};
 		check complete;
@@ -113,7 +118,7 @@ int config()
 			if(str_temp_read == "mode:")
 			{
 				ss_input >> conf.log;
-				if(ss_input.fail() || (conf.log != 0 && conf.log != 1))
+				if(ss_input.fail())
 				{
 					std::cerr << " Logging mode value incorrect." << std::endl;
 					return -4;
@@ -159,12 +164,22 @@ int config()
 					return -8;
 				}
 				complete.mesh = true;
+			} 
+			if(str_temp_read == "increase:")
+			{
+				ss_input >> conf.letsup;
+				if(ss_input.fail())
+				{
+					std::cerr << " Increase value incorrect." << std::endl;
+					return -9;
+				}
+				complete.letsup = true;
 			}
 		}
 		if(!complete.ok())
 		{
 			std::cerr << " Corrupted configuration file. Some parameters not found." << std::endl;
-			return -9;
+			return -10;
 		}
 	}
 	return 0;
@@ -182,17 +197,26 @@ void DisplayConfig()
 
 	if(conf.mode == 0)
 		std::cout << "IPv6 pattern (" << conf.str_search << "), ";
-	else if(conf.mode == 1)
+	else if(conf.mode == 1) 
+	{
 		std::cout << "high addresses (2" << std::setw(2) << std::setfill('0') << 
-			std::hex << conf.high << std::dec << "+), ";
+			std::hex << conf.high << std::dec; 
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), "; 
+	}
 	else if(conf.mode == 2)
-		std::cout << "by pattern & high (" << conf.str_search << " & 2" << 
- 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
+	{
+		std::cout << "by pattern (" << conf.str_search << ") & high (2" << 
+			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec;
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), ";
+	}
 	else if(conf.mode == 3)
 		std::cout << "IPv6 regexp (" << conf.rgx_search << "), ";
 	else if(conf.mode == 4)
-		std::cout << "IPv6 regexp & high (" << conf.rgx_search << " & 2" << 
- 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec << "+), ";
+	{
+		std::cout << "IPv6 regexp (" << conf.rgx_search << ") & high (2" << 
+ 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec;
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), ";
+	}
 	else if(conf.mode == 5)
 		std::cout << "meshname pattern (" << conf.str_search << "), ";
 	else if(conf.mode == 6)
