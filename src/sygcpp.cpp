@@ -198,7 +198,7 @@ void logStatistics()
 
 		std::chrono::duration<double, std::milli> df = blocks_duration;
 		blocks_duration = std::chrono::steady_clock::duration::zero();
-		int khs = conf.proc * countsize * BLOCKSIZE / df.count();
+		uint64_t khs = conf.proc * countsize * BLOCKSIZE / df.count();
 		std::cout <<
 			" kH/s: [" << std::setw(7) << std::setfill('_') << khs <<
 			"] Total: [" << std::setw(19) << block_count * BLOCKSIZE <<
