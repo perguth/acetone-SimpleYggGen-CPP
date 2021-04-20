@@ -1,5 +1,5 @@
 # SimpleYggGen-CPP
-Simple Yggdrasil address miner on C++. Простой майнер адресов Yggdrasil на C++.
+Simple Yggdrasil address miner in C++. Простой майнер адресов Yggdrasil на C++.
 
 Wiki (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
 
