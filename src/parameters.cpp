@@ -11,14 +11,17 @@ int parameters(option& conf, std::string arg)
 		
 		if (arg.find("--threads") != npos || arg.find("-t") != npos) {
 			ss >> conf.proc;
+			if (ss.fail()) return 1;
 			return 0;
 		}
 		if (arg.find("--pattern") != npos || arg.find("-p") != npos) {
 			ss >> conf.str;
+			if (ss.fail()) return 1;
 			return 0;
 		}
 		if (arg.find("--altitude") != npos || arg.find("-a") != npos) {
 			ss >> std::hex >> conf.high;
+			if (ss.fail()) return 1;
 			return 0;
 		}
 	}
@@ -39,8 +42,6 @@ int parameters(option& conf, std::string arg)
 	else if (arg == "--threads"  || arg == "-t") return 777; // Параметры, требующие значение
 	else if (arg == "--pattern"  || arg == "-p") return 777;
 	else if (arg == "--altitude" || arg == "-a") return 777;
-
-	else return 775; // Параметр не найден
 
 	return 0;
 }

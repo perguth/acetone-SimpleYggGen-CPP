@@ -40,8 +40,7 @@
 
 void intro()
 {
-	std::cout <<
-		std::endl << "\
+	std::cout << std::endl << "\
  +--------------------------------------------------------------------------+ \n\
  |                   [ SimpleYggGen C++ 4.0-unstoppable ]                   | \n\
  |                   X25519 -> SHA512 -> IPv6 -> Meshname                   | \n\
@@ -541,45 +540,44 @@ void startThreads()
 
 void error(int code)
 {
-	std::cerr << std::endl <<
-	" +--------------------------------------------------------------------------+\n" <<
-	" | Incorrect input, my dear friend. Use --help for usage information.       |\n" <<
-	" +--------------------------------------------------------------------------+\n" <<
-	" Error code: [" << code << "]";
+	std::cerr << std::endl << "\
+ +--------------------------------------------------------------------------+\n\
+ | Incorrect input, my dear friend. Use --help for usage information.       |\n\
+ +--------------------------------------------------------------------------+\n\
+ Error code: " << code << std::endl;
 }
 
 void help()
 {
-	std::cout << std::endl << 
-	" +--------------------------------------------------------------------------+\n"     <<
-	" |                   Simple Yggdrasil address miner usage                   |\n"     <<
-	" +--------------------------------------------------------------------------+\n"     <<
-	" High addresses mining                 -high <start position> <threads count>\n"     <<
-	"   example: -high 1f 1                       (start position 21f:*, 1 thread)\n\n"   <<
-	" IPv6 pattern mining                       -pattern <pattern> <threads count>\n"     <<
-	"   example: -pattern ace 2                        (search \"ace\", 2 threads)\n\n" <<
-	" IPv6 pattern & high mining    -ph <pattern> <start position> <threads count>\n"     <<
-	"   example: -ph ace 1a 4      (search \"ace\", start position 21a:*, 4 threads)\n\n" <<
-	" IPv6 regexp mining                        -regexp \"<regexp>\" <threads count>\n"   <<
-	"   example: -regexp \"^2[10-15].*.:a$\" 16                 (search, 16 threads)\n\n" <<
-	" IPv6 regexp & high mining   -rh \"<regexp>\" <start postition> <threads count>\n"   <<
-	"   example: -rh \":a{2,4}:.$\" 1a 4            (search, start 21a:*, 4 threads)\n\n" <<
-	" Meshname pattern mining               -meshpattern <pattern> <threads count>\n"     <<
-	"   example: -meshpattern acetone 8              (search \"acetone\", 8 threads)\n\n" <<
-	" Meshname regexp mining                -meshregexp \"<regexp>\" <threads count>\n"   <<
-	"   example: -meshregexp \"^aimbot\" 1                        (search, 1 thread)\n\n" <<
-	" Subnet brute force mining                      -brute <IPv6> <threads count>\n"     <<
-	"   example: -brute 300:b24b:: 4                    (search subnet, 4 threads)\n\n"   <<
-	" +--------------------------------------------------------------------------+\n"     <<
-	" Convert IP to Meshname                                        -tomesh <IPv6>\n"     <<
-	" Convert Meshname to IP                                        -toip <domain>\n"     <<
-	" +--------------------------------------------------------------------------+\n"     <<
-	" [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n"     <<
-	" [!] In meshname domain use \"=\" or \"===\" instead \".meshname\".          \n"     <<
-	" [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n"     <<
-	" +--------------------------------------------------------------------------+\n"     <<
-	" ALSO YOU CAN USE CONFIGURATION FILE INSTEAD PASSED PARAMETERS. JUST RUN SYG.\n";
-	
+	std::cout << std::endl << "\
+ +--------------------------------------------------------------------------+\n\
+ |                   Simple Yggdrasil address miner usage                   |\n\
+ +--------------------------------------------------------------------------+\n\
+ [Mining modes]                                                              \n\
+   High addresses                                                --high |  -h\n\
+   IPv6 by pattern                                                 --ip |  -i\n\
+   IPv6 by pattern + height                                   --ip-high | -ih\n\
+   IPv6 by regular expression                                  --regexp |  -r\n\
+   IPv6 by regular expression + height                    --regexp-high | -rh\n\
+   Meshname by pattern                                           --mesh |  -m\n\
+   Meshname by regular expression                         --mesh-regexp | -mr\n\
+   Subnet brute force (300::/64)                          --brute-force |  -b\n\
+ [Main parameters]                                                           \n\
+   Threads count                                       --threads | -t <value>\n\
+   String for pattern or regular expression            --pattern | -p <value>\n\
+   Start position for high addresses                  --altitude | -a <value>\n\
+ [Extra options]                                                             \n\
+   Disable auto-increase in high mode                         --increase-none\n\
+   Disable logging to text file, stdout only                   --logging-none\n\
+   Force display meshname domains                              --display-mesh\n\
+ +--------------------------------------------------------------------------+\n\
+ Convert IP to Meshname                                 --tomesh / -tm <IPv6>\n\
+ Convert Meshname to IP                                 --toip / -ti <domain>\n\
+ +--------------------------------------------------------------------------+\n\
+ [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n\
+ [!] In meshname domain mining should use \"=\" instead \".meshname\".       \n\
+ [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n\
+ +--------------------------------------------------------------------------+\n";
 }
 
 int main(int argc, char *argv[])
@@ -616,19 +614,18 @@ int main(int argc, char *argv[])
 					++i;
 					if (argv[i] == nullptr) { // Значение параметра не передано
 						error(776);
-						std::cerr << " Empty parameter [" << argv[i-1] << "]" << std::endl;
+						std::cerr << " Empty value for parameter [" << argv[i-1] << "]" << std::endl;
 						return 776;
 					}
 
 					int res2 = parameters(conf, std::string( std::string(argv[i-1]) + " " + std::string(argv[i])) );
 					if (res2 != 0) { // Значение передано, но является некорректным
 						error(res);
-						std::cerr << " Bad value for parameter [" << argv[i-1] << "]" << std::endl;
+						std::cerr << " Wrong value for parameter \"" << argv[i-1] << "\"" << std::endl;
 						return res;
 					}
 				}
 			}
-			
 			intro();
 			displayConfig();
 			testoutput();
