@@ -501,10 +501,10 @@ int main(int argc, char *argv[])
 	{
 		///////////////////////////////// Доп. функции конвертации адресов
 		p1 = argv[1];
-		if (p1 == "-help" || p1 == "-h") {
+		if (p1 == "--help") {
 			help();
 			return 0;
-		} else if (p1 == "-tomesh") { // преобразование IP -> Meshname
+		} else if (p1 == "--tomesh" || p1 == "-tm") { // преобразование IP -> Meshname
 			if (argv[2] != nullptr) {
 				convertStrToRaw(argv[2], conf.raw_search);
 				std::string mesh = getMeshname(conf.raw_search);
@@ -512,7 +512,7 @@ int main(int argc, char *argv[])
 				pickupMeshnameForOutput(mesh) << std::endl;
 				return 0;
 			} else { error(); return -501; }
-		} else if (p1 == "-toip") { // преобразование Meshname -> IP
+		} else if (p1 == "--toip" || p1 == "-ti") { // преобразование Meshname -> IP
 			if (argv[2] != nullptr) {
 				std::cout << std::endl <<
 				decodeMeshToIP(argv[2]) << std::endl;
@@ -521,7 +521,7 @@ int main(int argc, char *argv[])
 		} 
 		
 		///////////////////////////////// Штатные функции
-		  else if (p1 == "-high") { // high mining
+		  else if (p1 == "--high" || p1 == "-h") { // high mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 1;
 				std::istringstream ss(argv[2]);
@@ -532,7 +532,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -503; }
-		} else if (p1 == "-pattern") { // IPv6 pattern mining
+		} else if (p1 == "--pattern" || p1 == "-p") { // IPv6 pattern mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 0;
 				conf.str_search = argv[2];
@@ -542,7 +542,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -504; }
-		} else if (p1 == "-ph") { // pattern & high mining
+		} else if (p1 == "--pattern-high" || p1 == "-ph") { // pattern & high mining
 			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
 				conf.mode = 2;
 				conf.str_search = argv[2];
@@ -554,7 +554,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -505; }
-		} else if (p1 == "-regexp") { // IPv6 regexp mining
+		} else if (p1 == "--regexp" || p1 == "-r") { // IPv6 regexp mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 3;
 				conf.rgx_search = argv[2];
@@ -564,7 +564,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -506; }
-		} else if (p1 == "-rh") { // IPv6 regexp & high mining
+		} else if (p1 == "--regexp-high" || p1 == "-rh") { // IPv6 regexp & high mining
 			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
 				conf.mode = 4;
 				conf.rgx_search = argv[2];
@@ -576,7 +576,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -507; }
-		} else if (p1 == "-meshpattern") { // meshname pattern mining
+		} else if (p1 == "--meshpattern" || p1 == "-m") { // meshname pattern mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 5;
 				conf.str_search = argv[2];
@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -508; }
-		} else if (p1 == "-meshregexp") { // meshname regexp mining
+		} else if (p1 == "--mesh-regexp" || p1 == "-mr") { // meshname regexp mining
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 6;
 				conf.rgx_search = argv[2];
@@ -596,7 +596,7 @@ int main(int argc, char *argv[])
 				testoutput();
 				startThreads();
 			} else { error(); return -509; }
-		} else if (p1 == "-brute") { // subnet brute force
+		} else if (p1 == "--brute-force" || p1 == "-b") { // subnet brute force
 			if (argv[2] != nullptr && argv[3] != nullptr) {
 				conf.mode = 7;
 				conf.str_search = argv[2];
