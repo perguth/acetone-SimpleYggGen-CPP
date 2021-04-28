@@ -1,6 +1,8 @@
+#ifndef X25519_H
+#define X25519_H
+
 #include <stdint.h>
 #include <vector>
-
 
 #define KEYSIZE 32
 
@@ -39,3 +41,5 @@ public:
 private:
 	ge25519 data[255];
 };
+
+#endif

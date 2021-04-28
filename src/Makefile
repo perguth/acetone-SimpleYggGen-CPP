@@ -4,7 +4,7 @@ SYS = $(shell $(CXX) -dumpmachine)
 STATIC := no
 DEBUG  := no
 
-SYG_SRC = sygcpp.cpp x25519.cpp sha512.cpp
+SYG_SRC = sygcpp.cpp x25519.cpp sha512.cpp parameters.cpp
 SYGCPP  = _build/sygcpp
 
 CXXFLAGS := -march=core2

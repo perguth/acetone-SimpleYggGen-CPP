@@ -29,24 +29,27 @@
 	#include <arpa/inet.h>
 #endif
 
+#include "sygcpp.h"
 #include "x25519.h"
 #include "sha512.h"
+#include "configure.h"
+#include "parametes.h"
 #include "cppcodec/base32_rfc4648.hpp" 
 
 #define BLOCKSIZE 10000
 
-void Intro()
+void intro()
 {
 	std::cout <<
-		std::endl <<
-		" +--------------------------------------------------------------------------+" << std::endl <<
-		" |                   [ SimpleYggGen C++ 3.4.1-sweetassy ]                   |" << std::endl <<
-		" |                   X25519 -> SHA512 -> IPv6 -> Meshname                   |" << std::endl <<
-		" |                   notabug.org/acetone/SimpleYggGen-CPP                   |" << std::endl <<
-		" |                                                                          |" << std::endl <<
-		" |                              GPLv3 (c) 2021                              |" << std::endl <<
-		" +--------------------------------------------------------------------------+" << std::endl <<
-		std::endl;
+		std::endl << "\
+ +--------------------------------------------------------------------------+ \n\
+ |                   [ SimpleYggGen C++ 4.0-unstoppable ]                   | \n\
+ |                   X25519 -> SHA512 -> IPv6 -> Meshname                   | \n\
+ |                   notabug.org/acetone/SimpleYggGen-CPP                   | \n\
+ |                                                                          | \n\
+ |                              GPLv3 (c) 2021                              | \n\
+ +--------------------------------------------------------------------------+ " 
+ << std::endl;
 }
 
 std::mutex mtx;
@@ -58,8 +61,92 @@ uint64_t block_count = 0;        // количество вычисленных 
 uint64_t totalcountfortune = 0;  // счетчик нахождений
 bool newline = false;            // форматирует вывод после нахождения адреса
 std::chrono::steady_clock::duration blocks_duration(0);
+static option conf;
 
-#include "basefiles.cpp"
+void displayConfig()
+{
+	// из-за регулирования количества потоков и countsize вызов функции обязателен
+	unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
+	if (conf.proc > (int)processor_count)
+		conf.proc = (int)processor_count;
+	countsize = 800 << __bsrq(conf.proc);
+	
+	std::cout << " Threads: " << conf.proc << ", ";
+
+	if(conf.mode == 0)
+		std::cout << "IPv6 pattern (" << conf.str << "), ";
+	else if(conf.mode == 1) 
+	{
+		std::cout << "high addresses (2" << std::setw(2) << std::setfill('0') << 
+			std::hex << conf.high << std::dec; 
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), "; 
+	}
+	else if(conf.mode == 2)
+	{
+		std::cout << "by pattern (" << conf.str << ") & high (2" << 
+			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec;
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), ";
+	}
+	else if(conf.mode == 3)
+		std::cout << "IPv6 regexp (" << conf.str << "), ";
+	else if(conf.mode == 4)
+	{
+		std::cout << "IPv6 regexp (" << conf.str << ") & high (2" << 
+ 			std::setw(2) << std::setfill('0') << std::hex << conf.high << std::dec;
+			(conf.letsup != 0) ? std::cout << "++), " : std::cout << "+), ";
+	}
+	else if(conf.mode == 5)
+		std::cout << "meshname pattern (" << conf.str << "), ";
+	else if(conf.mode == 6)
+		std::cout << "meshname regexp (" << conf.str << "), ";
+	else if(conf.mode == 7)
+		std::cout << "subnet brute force (" << conf.str << "/64), ";
+	
+	if(conf.log)
+		std::cout << "logging to text file.";
+	else
+		std::cout << "console log only.";
+
+	if((conf.mode == 5 || conf.mode == 6) && conf.mesh == 0)
+		conf.mesh = 1; // принудительно включаем отображение мешнейм-доменов при их майнинге
+	std::cout << std::endl << std::endl;
+}
+
+void testoutput()
+{
+	if(conf.log) // проверка включено ли логирование
+	{
+		if(conf.mode == 0)
+			conf.outputfile = "syg-ipv6-pattern.txt";
+		else if(conf.mode == 1)
+			conf.outputfile = "syg-ipv6-high.txt";
+		else if(conf.mode == 2)
+			conf.outputfile = "syg-ipv6-pattern-high.txt";
+		else if(conf.mode == 3)
+			conf.outputfile = "syg-ipv6-regexp.txt";
+		else if(conf.mode == 4)
+			conf.outputfile = "syg-ipv6-regexp-high.txt";
+		else if(conf.mode == 5)
+			conf.outputfile = "syg-meshname-pattern.txt";
+		else if(conf.mode == 6)
+			conf.outputfile = "syg-meshname-regexp.txt";
+		else if(conf.mode == 7)
+			conf.outputfile = "syg-subnet-brute-force.txt";
+
+		std::ifstream test(conf.outputfile);
+		if(!test) // проверка наличия выходного файла
+		{
+			test.close();
+			std::ofstream output(conf.outputfile);
+			output << "**************************************************************************\n"
+			       << "Change EncryptionPublicKey and EncryptionPrivateKey to your yggdrasil.conf\n"
+			       << "Windows: C:\\ProgramData\\Yggdrasil\\yggdrasil.conf\n"
+			       << "Debian: /etc/yggdrasil.conf\n"
+			       << "**************************************************************************\n";
+			output.close();
+		} else test.close();
+	}
+}
 
 int getOnes(const unsigned char HashValue[crypto_hash_sha512_BYTES])
 {
@@ -177,8 +264,8 @@ std::string decodeMeshToIP(const std::string str)
 
 void subnetCheck()
 {
-	if(conf.str_search[0] == '3') // замена 300::/64 на целевой 200::/7
-		conf.str_search[0] = '2';
+	if(conf.str[0] == '3') // замена 300::/64 на целевой 200::/7
+		conf.str[0] = '2';
 }
 
 bool convertStrToRaw(std::string str, uint8_t * array)
@@ -287,23 +374,23 @@ void miner_thread()
 
 	if (T == 4 || T == 5) // meshname pattern
 	{
-		std::string tmp = pickupStringForMeshname(conf.str_search);
-		conf.str_search = tmp;
+		std::string tmp = pickupStringForMeshname(conf.str);
+		conf.str = tmp;
 		
-		for (auto it = conf.rgx_search.begin(); it != conf.rgx_search.end(); it++)
+		for (auto it = conf.str.begin(); it != conf.str.end(); it++)
 			*it = toupper(*it);
 	} 
-	std::regex regx(conf.rgx_search, std::regex_constants::egrep);
+	std::regex regx(conf.str, std::regex_constants::egrep);
 	if (T == 7) // subnet brute force
 	{
 		mtx.lock();
 		if(!conf.sbt_alarm) // однократный вывод ошибки
 		{
 			subnetCheck();
-			bool result = convertStrToRaw(conf.str_search, conf.raw_search);
-			if(!result || (conf.str_search != getAddress(conf.raw_search)))
+			bool result = convertStrToRaw(conf.str, conf.raw_search);
+			if(!result || (conf.str != getAddress(conf.raw_search)))
 			{
-				std::cerr << " WARNING: Your string [" << conf.str_search << "] converted to IP [" << 
+				std::cerr << " WARNING: Your string [" << conf.str << "] converted to IP [" << 
 				getAddress(conf.raw_search) << "]" << std::endl << std::endl;
 			}
 			conf.sbt_alarm = true;
@@ -329,7 +416,7 @@ void miner_thread()
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getAddress(rawAddr).find(
-					conf.str_search.c_str()) != std::string::npos)
+					conf.str.c_str()) != std::string::npos)
 				{
 					fortune_key_index = i;
 					break; 
@@ -361,7 +448,7 @@ void miner_thread()
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (newones > conf.high && getAddress(rawAddr).find(
-					conf.str_search.c_str()) != std::string::npos)
+					conf.str.c_str()) != std::string::npos)
 				{
 					if (conf.letsup != 0) conf.high = newones;
 					fortune_key_index = i;
@@ -397,7 +484,7 @@ void miner_thread()
 				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getMeshname(rawAddr).find(
-					conf.str_search.c_str()) != std::string::npos)
+					conf.str.c_str()) != std::string::npos)
 				{
 					fortune_key_index = i;
 					break;
@@ -452,12 +539,13 @@ void startThreads()
 	lastThread->join();
 }
 
-void error()
+void error(int code)
 {
 	std::cerr << std::endl <<
 	" +--------------------------------------------------------------------------+\n" <<
-	" | Incorrect input, my dear friend. Use -help or -h for usage information.  |\n" <<
-	" +--------------------------------------------------------------------------+\n";
+	" | Incorrect input, my dear friend. Use --help for usage information.       |\n" <<
+	" +--------------------------------------------------------------------------+\n" <<
+	" Error code: [" << code << "]";
 }
 
 void help()
@@ -508,122 +596,44 @@ int main(int argc, char *argv[])
 			if (argv[2] != nullptr) {
 				convertStrToRaw(argv[2], conf.raw_search);
 				std::string mesh = getMeshname(conf.raw_search);
-				std::cout << std::endl <<
-				pickupMeshnameForOutput(mesh) << std::endl;
+				std::cout << std::endl << pickupMeshnameForOutput(mesh) << std::endl;
 				return 0;
-			} else { error(); return -501; }
+			} else { error(-501); return -501; }
 		} else if (p1 == "--toip" || p1 == "-ti") { // преобразование Meshname -> IP
 			if (argv[2] != nullptr) {
-				std::cout << std::endl <<
-				decodeMeshToIP(argv[2]) << std::endl;
+				std::cout << std::endl << decodeMeshToIP(argv[2]) << std::endl;
 				return 0;
-			} else { error(); return -502; }
-		} 
-		
+			} else { error(-502); return -502; }
+
 		///////////////////////////////// Штатные функции
-		  else if (p1 == "--high" || p1 == "-h") { // high mining
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 1;
-				std::istringstream ss(argv[2]);
-				ss >> std::hex >> conf.high;
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -503; }
-		} else if (p1 == "--pattern" || p1 == "-p") { // IPv6 pattern mining
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 0;
-				conf.str_search = argv[2];
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -504; }
-		} else if (p1 == "--pattern-high" || p1 == "-ph") { // pattern & high mining
-			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
-				conf.mode = 2;
-				conf.str_search = argv[2];
-				std::istringstream ss(argv[3]);
-				ss >> std::hex >> conf.high;
-				conf.proc = std::stoi(argv[4]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -505; }
-		} else if (p1 == "--regexp" || p1 == "-r") { // IPv6 regexp mining
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 3;
-				conf.rgx_search = argv[2];
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -506; }
-		} else if (p1 == "--regexp-high" || p1 == "-rh") { // IPv6 regexp & high mining
-			if (argv[2] != nullptr && argv[3] != nullptr && argv[4] != nullptr) {
-				conf.mode = 4;
-				conf.rgx_search = argv[2];
-				std::istringstream ss(argv[3]);
-				ss >> std::hex >> conf.high;
-				conf.proc = std::stoi(argv[4]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -507; }
-		} else if (p1 == "--meshpattern" || p1 == "-m") { // meshname pattern mining
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 5;
-				conf.str_search = argv[2];
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -508; }
-		} else if (p1 == "--mesh-regexp" || p1 == "-mr") { // meshname regexp mining
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 6;
-				conf.rgx_search = argv[2];
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -509; }
-		} else if (p1 == "--brute-force" || p1 == "-b") { // subnet brute force
-			if (argv[2] != nullptr && argv[3] != nullptr) {
-				conf.mode = 7;
-				conf.str_search = argv[2];
-				conf.proc = std::stoi(argv[3]);
-				Intro();
-				DisplayConfig();
-				testoutput();
-				startThreads();
-			} else { error(); return -510; }
-		} else {error(); return -511;} // Первый параметр - неверный
-		
-	} else { // Запуск без параметров, работа с конфигом
-	
-		Intro();
-		int configcheck = config(); // функция получения конфигурации
-		if(configcheck < 0)
-		{
-			std::cerr << " Error code: " << configcheck;
-			std::this_thread::sleep_for(std::chrono::seconds(15));
-			return configcheck;
+		} else { 
+			int res = -1;
+			for(int i = 1;; ++i) {
+				if (argv[i] == nullptr) break;
+				
+				res = parameters(conf, std::string(argv[i]));
+				if (res == 777) { // Нужно передать параметр
+					++i;
+					if (argv[i] == nullptr) { // Значение параметра не передано
+						error(776);
+						std::cerr << " Empty parameter [" << argv[i-1] << "]" << std::endl;
+						return 776;
+					}
+
+					int res2 = parameters(conf, std::string( std::string(argv[i-1]) + " " + std::string(argv[i])) );
+					if (res2 != 0) { // Значение передано, но является некорректным
+						error(res);
+						std::cerr << " Bad value for parameter [" << argv[i-1] << "]" << std::endl;
+						return res;
+					}
+				}
+			}
+			
+			intro();
+			displayConfig();
+			testoutput();
+			startThreads();
 		}
-		DisplayConfig();
-		testoutput();
-		startThreads();
 	}
-	
-	std::cerr << "SYG has stopped working unexpectedly! Please, report about this.";
-	std::this_thread::sleep_for(std::chrono::seconds(15));
-	return -420;
+	return -1; // Этого никогда не случится
 }
