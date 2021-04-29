@@ -397,22 +397,24 @@ void miner_thread()
 		mtx.unlock();
 	}
 	
+	uint8_t rawAddr[16];
+	int fortune_key_index = 0;
+	int newones = 0;
 	for (;;)
 	{
 		auto start_time = std::chrono::steady_clock::now();
 
-		int fortune_key_index = -1;
+		fortune_key_index = -1;
 		randombytes(random_bytes, KEYSIZE);
 		block.calculate_public_keys(random_bytes);
 		for (int i = 0; i < BLOCKSIZE; i++)
 		{
 			block.get_public_key(public_key, i);
 			crypto_hash_sha512(sha512_hash, public_key);
-			int newones = getOnes(sha512_hash);
+			newones = getOnes(sha512_hash);
 			
 			if (T == 0) // IPv6 pattern mining
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getAddress(rawAddr).find(
 					conf.str.c_str()) != std::string::npos)
@@ -444,7 +446,6 @@ void miner_thread()
 			}
 			if (T == 2) // pattern & high mining
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (newones > conf.high && getAddress(rawAddr).find(
 					conf.str.c_str()) != std::string::npos)
@@ -456,7 +457,6 @@ void miner_thread()
 			}
 			if (T == 3) // IPv6 regexp mining
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (std::regex_search((getAddress(rawAddr)), regx))
 				{
@@ -466,7 +466,6 @@ void miner_thread()
 			}
 			if (T == 4) // meshname & high
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (newones > conf.high)
 				{
@@ -480,7 +479,6 @@ void miner_thread()
 			}
 			if (T == 5) // meshname pattern mining
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (getMeshname(rawAddr).find(
 					conf.str.c_str()) != std::string::npos)
@@ -491,7 +489,6 @@ void miner_thread()
 			}
 			if (T == 6) // meshname regexp mining
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (std::regex_search((getMeshname(rawAddr)), regx))
 				{
@@ -501,7 +498,6 @@ void miner_thread()
 			}
 			if (T == 7) // subnet brute force
 			{
-				uint8_t rawAddr[16];
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				for(int z = 0; conf.raw_search[z] == rawAddr[z]; ++z)
 				{
