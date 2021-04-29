@@ -464,7 +464,7 @@ void miner_thread()
 					break;
 				}
 			}
-			if (T == 4) // meshname & high
+			if (T == 4) // IPv6 regexp & high mining
 			{
 				getRawAddress(newones, sha512_hash, rawAddr); // получаем адрес
 				if (newones > conf.high)
