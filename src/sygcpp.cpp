@@ -111,7 +111,7 @@ void displayConfig()
 	std::cout << std::endl << std::endl;
 }
 
-void testoutput()
+void testOutput()
 {
 	if(conf.log) // проверка включено ли логирование
 	{
@@ -551,32 +551,33 @@ void help()
 {
 	std::cout << std::endl << "\
  +--------------------------------------------------------------------------+\n\
- |                   Simple Yggdrasil address miner usage                   |\n\
+ |               Simple Yggdrasil address miner usage:  --help              |\n\
  +--------------------------------------------------------------------------+\n\
  [Mining modes]                                                              \n\
-   High addresses                                                --high |  -h\n\
-   IPv6 by pattern                                                 --ip |  -i\n\
-   IPv6 by pattern + height                                   --ip-high | -ih\n\
-   IPv6 by regular expression                                  --regexp |  -r\n\
-   IPv6 by regular expression + height                    --regexp-high | -rh\n\
-   Meshname by pattern                                           --mesh |  -m\n\
-   Meshname by regular expression                         --mesh-regexp | -mr\n\
-   Subnet brute force (300::/64)                          --brute-force |  -b\n\
+   High addresses (default)                              --high |  -h        \n\
+   IPv6 by pattern                                         --ip |  -i        \n\
+   IPv6 by pattern + height                           --ip-high | -ih        \n\
+   IPv6 by regular expression                          --regexp |  -r        \n\
+   IPv6 by regular expression + height            --regexp-high | -rh        \n\
+   Meshname by pattern                                   --mesh |  -m        \n\
+   Meshname by regular expression                 --mesh-regexp | -mr        \n\
+   Subnet brute force (300::/64)                  --brute-force |  -b        \n\
  [Main parameters]                                                           \n\
-   Threads count                                       --threads | -t <value>\n\
-   String for pattern or regular expression            --pattern | -p <value>\n\
-   Start position for high addresses                  --altitude | -a <value>\n\
+   Threads count (maximum by default)                 --threads |  -t <value>\n\
+   String for pattern or regular expression           --pattern |  -p <value>\n\
+   Start position for high addresses (14 by default) --altitude |  -a <value>\n\
  [Extra options]                                                             \n\
-   Disable auto-increase in high mode                         --increase-none\n\
-   Disable logging to text file, stdout only                   --logging-none\n\
-   Force display meshname domains                              --display-mesh\n\
- +--------------------------------------------------------------------------+\n\
- Convert IP to Meshname                                 --tomesh / -tm <IPv6>\n\
- Convert Meshname to IP                                 --toip / -ti <domain>\n\
- +--------------------------------------------------------------------------+\n\
- [!] Meshname domains use base32 (RFC4648) alphabet symbols.                 \n\
- [!] In meshname domain mining should use \"=\" instead \".meshname\".       \n\
- [!] Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.      \n\
+   Disable auto-increase in high mode           --increase-none |            \n\
+   Disable logging to text file, stdout only     --logging-none |            \n\
+   Force display meshname domains                --display-mesh |            \n\
+   Displays the version of the miner                  --version |  -v        \n\
+ [Meshname convertation]                                                     \n\
+   Convert IP to Meshname                              --tomesh | -tm <value>\n\
+   Convert Meshname to IP                                --toip | -ti <value>\n\
+ [Notes]                                                                     \n\
+   Meshname domains use base32 (RFC4648) alphabet symbols.                   \n\
+   In meshname domain mining should use \"=\" instead \".meshname\".         \n\
+   Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.        \n\
  +--------------------------------------------------------------------------+\n";
 }
 
@@ -587,9 +588,11 @@ int main(int argc, char *argv[])
 	{
 		///////////////////////////////// Доп. функции конвертации адресов
 		p1 = argv[1];
-		if (p1 == "--help") {
+		if (p1 == "--help" || p1 == "-help" || p1 == "help") {
 			help();
 			return 0;
+		} else if (p1 == "--version" || p1 == "-v") {
+			intro();
 		} else if (p1 == "--tomesh" || p1 == "-tm") { // преобразование IP -> Meshname
 			if (argv[2] != nullptr) {
 				convertStrToRaw(argv[2], conf.raw_search);
@@ -621,16 +624,18 @@ int main(int argc, char *argv[])
 					int res2 = parameters(conf, std::string( std::string(argv[i-1]) + " " + std::string(argv[i])) );
 					if (res2 != 0) { // Значение передано, но является некорректным
 						error(res);
-						std::cerr << " Wrong value for parameter \"" << argv[i-1] << "\"" << std::endl;
+						std::cerr << " Wrong value \"" << argv[i] <<"\" for parameter \"" << argv[i-1] << "\"" << std::endl;
 						return res;
 					}
 				}
 			}
 			intro();
 			displayConfig();
-			testoutput();
+			testOutput();
 			startThreads();
 		}
-	}
+	// --help при запуске без параметров.
+	//  Задержка для пользователей, запустивших не через терминал, чтобы увидели окно.
+	} else { help(); std::this_thread::sleep_for(std::chrono::hours(24)); }
 	return -1; // Этого никогда не случится
 }
