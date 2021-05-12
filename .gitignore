@@ -1,2 +1,39 @@
-﻿src/_build
-src/*.kate-swp
+﻿src/yggdrasil-0.3.x/_build
+src/yggdrsail-0.3.x/*.kate-swp
+
+# ---> Qt
+# C++ objects and libs
+
+*.slo
+*.lo
+*.o
+*.a
+*.la
+*.lai
+*.so
+*.dll
+*.dylib
+
+# Qt-es
+
+src/yggdrasil-0.4.x/.qmake.cache
+src/yggdrasil-0.4.x/.qmake.stash
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+# Makefile*
+*-build-*
+
+# QtCreator
+
+*.autosave
+
+#QtCtreator Qml
+*.qmlproject.user
+*.qmlproject.user.*
+
