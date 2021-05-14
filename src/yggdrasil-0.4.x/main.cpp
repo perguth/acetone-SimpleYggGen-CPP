@@ -162,7 +162,7 @@ void logKeys(Address raw, const KeysBox keys)
             std::string mesh = getMeshname(raw);
             output << "Domain:               " << pickupMeshnameForOutput(mesh) << std::endl;
         }
-        output << "Address:              " << getAddress(raw.data()) << std::endl;
+        output << "Address:           " << getAddress(raw.data()) << std::endl;
         output << "SigningPublicKey:  " << keyToString(keys.PublicKey) << std::endl;
         output << "SigningPrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
         output.close();
