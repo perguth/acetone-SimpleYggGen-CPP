@@ -149,7 +149,7 @@ void logKeys(Address raw, const KeysBox keys)
         std::string mesh = getMeshname(raw);
         std::cout << " Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
     }
-    std::cout << " Address:    " << getAddress(raw.data()) << std::endl;
+    std::cout << " Address:    " << getAddress(raw) << std::endl;
     std::cout << " PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
     std::cout << " PrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
     std::cout << std::endl;
@@ -160,9 +160,9 @@ void logKeys(Address raw, const KeysBox keys)
         output << std::endl;
         if (conf.mesh) {
             std::string mesh = getMeshname(raw);
-            output << "Domain:               " << pickupMeshnameForOutput(mesh) << std::endl;
+            output << "Domain:            " << pickupMeshnameForOutput(mesh) << std::endl;
         }
-        output << "Address:           " << getAddress(raw.data()) << std::endl;
+        output << "Address:           " << getAddress(raw) << std::endl;
         output << "SigningPublicKey:  " << keyToString(keys.PublicKey) << std::endl;
         output << "SigningPrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
         output.close();
@@ -223,7 +223,7 @@ std::string decodeMeshToIP(const std::string str)
 {
     std::string mesh = pickupStringForMeshname(str) + "======"; // 6 паддингов - норма для IPv6 адреса
     std::vector<uint8_t> raw = cppcodec::base32_rfc4648::decode(mesh);
-    uint8_t rawAddr[16];
+    Address rawAddr;
     for(int i = 0; i < 16; ++i)
         rawAddr[i] = raw[i];
     return std::string(getAddress(rawAddr));
@@ -306,10 +306,10 @@ int getOnes(const Key value)
     return 0; // никогда не случится
 }
 
-std::string getAddress(const uint8_t * rawAddr)
+std::string getAddress(const Address rawAddr)
 {
     char ipStrBuf[46];
-    inet_ntop(AF_INET6, rawAddr, ipStrBuf, 46);
+    inet_ntop(AF_INET6, rawAddr.data(), ipStrBuf, 46);
     return std::string(ipStrBuf);
 }
 
@@ -317,7 +317,7 @@ std::string hexArrayToString(const uint8_t* bytes, int length)
 {
     std::stringstream ss;
     for (int i = 0; i < length; i++)
-        ss << std::setw(2) << std::setfill('0') << std::hex << (int)bytes[i];
+        ss << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(bytes[i]);
     return ss.str();
 }
 
@@ -356,7 +356,7 @@ void miner_thread()
                 if (conf.letsup != 0) conf.high = ones;
                 process_fortune_key(keys);
             }
-        } else { std::cout << "Only one mode implemented" << std::endl; break; } // FIXME
+        } else { std::cout << "Only high mode implemented yet" << std::endl; break; } // FIXME
 
         auto stop_time = std::chrono::steady_clock::now();
         ++totalcount;
@@ -365,7 +365,6 @@ void miner_thread()
         logStatistics();
         mtx.unlock();
     }
-
 }
 
 void startThreads()
@@ -484,9 +483,9 @@ int main(int argc, char *argv[])
             testOutput();
             startThreads();
         }
+    }
     // --help при запуске без параметров.
     //  Задержка для пользователей, запустивших не через терминал, чтобы увидили окно.
-    } else { help(); std::this_thread::sleep_for(std::chrono::hours(24)); }
-    return -1; // Этого никогда не случится
+    else { help(); std::this_thread::sleep_for(std::chrono::hours(1)); }
     return 0;
 }

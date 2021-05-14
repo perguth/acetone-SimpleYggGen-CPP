@@ -3,7 +3,6 @@
 
 #include <openssl/evp.h>
 #include <openssl/bn.h>
-#include <x86intrin.h>   // __bsrq
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -46,7 +45,7 @@ KeysBox getKeyPair();
 void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr);
 Key bitwiseInverse(const Key key);
 int getOnes(const Key value);
-std::string getAddress(const uint8_t * rawAddr);
+std::string getAddress(const Address rawAddr);
 std::string hexArrayToString(const uint8_t* bytes, int length);
 std::string keyToString(const Key key);
 void process_fortune_key(const KeysBox& block);
