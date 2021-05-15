@@ -26,7 +26,7 @@ src/yggdrasil-0.4.x/.qmake.stash
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
-Makefile*
+# Makefile*
 *build-*
 
 # QtCreator
