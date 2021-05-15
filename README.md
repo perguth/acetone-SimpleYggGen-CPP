@@ -1,11 +1,112 @@
-# SimpleYggGen-CPP
-Simple Yggdrasil address miner in C++. Простой майнер адресов Yggdrasil на C++.
-
-Wiki (russian language page): [Yggdrasil link](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
-
+### SimpleYggGen-CPP [![Download SimpleYggGen-CPP](https://img.shields.io/sourceforge/dt/simpleygggen.svg)](https://sourceforge.net/projects/simpleygggen/files/latest/download)
 ```
 ILITA IRC:
-Yggdrasil    324:9de3:fea4:f6ac::41    6667    non-SSL
+Yggdrasil    324:9de3:fea4:f6ac::41    6667
 General channels: #howtoygg and #ru
 ```
-[![Download SimpleYggGen-CPP](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/simpleygggen/files/latest/download)
+
+## Майнер адресов сети Yggdrasil на C++
+Начиная с версии 0.4.0 Yggdrasil Network использует новый алгоритм генерации IPv6-адресов. С версии **5.0** SimpleYggGen поддерживает только новый алгоритм. [Wiki](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
+
+#### Сборка на Linux
+- Установите необходимые пакеты:
+
+```bash
+sudo apt-get install cmake git g++ libssl-dev
+```
+- Клонируйте данный репозиторий:
+
+```bash
+git clone https://notabug.org/acetone/SimpleYggGen-CPP.git
+cd ./SimpleYggGen-CPP
+```
+
+- Скомпилируйте приложение:
+
+```bash
+mkdir _build && cd _build
+cmake -G "Unix Makefiles" ..
+make
+```
+
+- Запустите бинарный файл `sygcpp`
+
+#### Сборка на Windows в [MSYS2](https://www.msys2.org/)
+
+- Запустите оболочку MSYS2 MinGW 64-bit
+- Установите необходимые пакеты: 
+
+```bash
+pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-cmake
+```
+
+- Клонируйте данный репозиторий:
+
+```bash
+git clone https://notabug.org/acetone/SimpleYggGen-CPP.git
+cd ./SimpleYggGen-CPP
+```
+
+- Скомпилируйте приложение:
+
+```bash
+mkdir _build && cd _build
+cmake -G "MinGW Makefiles" ..
+mingw32-make
+```
+
+- Запустите бинарный файл `sygcpp.exe`
+
+## Yggdrasil Network address miner in C++ 
+
+Starting with version 0.4.0 Yggdrasil Network uses the new IPv6 address generation algorithm. Since version **5.0**, SimpleYggGen only supports the new algorithm.
+
+#### How build on Linux
+- Install required packages: 
+
+```bash
+sudo apt-get install cmake git g++ libssl-dev
+```
+
+- Clone this repository:
+
+```bash
+git clone https://notabug.org/acetone/SimpleYggGen-CPP.git
+cd ./SimpleYggGen-CPP
+```
+
+- Compile application:
+
+```bash
+mkdir _build && cd _build
+cmake -G "Unix Makefiles" ..
+make
+```
+
+- Run binary file `sygcpp`
+
+
+#### How build on Windows under [MSYS2](https://www.msys2.org/) shell
+- Run MSYS2 MinGW 64-bit shell
+- Install required packages: 
+
+```bash
+pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-cmake
+```
+
+- Clone this repository:
+
+```bash
+git clone https://notabug.org/acetone/SimpleYggGen-CPP.git
+cd ./SimpleYggGen-CPP
+```
+
+- Compile application:
+
+```bash
+mkdir _build && cd _build
+cmake -G "MinGW Makefiles" ..
+mingw32-make
+```
+
+- Run binary file `sygcpp.exe`
