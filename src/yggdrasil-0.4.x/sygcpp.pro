@@ -7,23 +7,30 @@ SOURCES += \
         main.cpp \
         parameters.cpp
 
-LIBS += \
+win32 {
+    LIBS += \
         -lcrypto \
         -lpthread \
         -lws2_32
+}
+!win32 {
+    LIBS += \
+        -lcrypto \
+        -lpthread
+}
 
 QMAKE_CXXFLAGS += \
         -O3
 
 HEADERS += \
-    configure.h \
-    cppcodec/base32_rfc4648.hpp \
-    cppcodec/data/access.hpp \
-    cppcodec/data/raw_result_buffer.hpp \
-    cppcodec/detail/base32.hpp \
-    cppcodec/detail/codec.hpp \
-    cppcodec/detail/config.hpp \
-    cppcodec/detail/stream_codec.hpp \
-    cppcodec/parse_error.hpp \
-    main.h \
-    parametes.h
+        configure.h \
+        cppcodec/base32_rfc4648.hpp \
+        cppcodec/data/access.hpp \
+        cppcodec/data/raw_result_buffer.hpp \
+        cppcodec/detail/base32.hpp \
+        cppcodec/detail/codec.hpp \
+        cppcodec/detail/config.hpp \
+        cppcodec/detail/stream_codec.hpp \
+        cppcodec/parse_error.hpp \
+        main.h \
+        parametes.h
