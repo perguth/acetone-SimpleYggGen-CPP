@@ -1,5 +1,5 @@
-﻿src/yggdrasil-0.3.x/_build
-src/yggdrsail-0.3.x/*.kate-swp
+﻿*_build
+*.kate-swp
 
 # ---> Qt
 # C++ objects and libs

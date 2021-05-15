@@ -444,7 +444,7 @@ int main(int argc, char *argv[])
     if(argc >= 2)
     {
         std::string p1;
-        ///////////////////////////////// Доп. функции конвертации адресов
+        ///////////////////////////////// Вспомогательные функции
         p1 = argv[1];
         if (p1 == "--help" || p1 == "-help" || p1 == "-h") {
             help();
@@ -465,7 +465,7 @@ int main(int argc, char *argv[])
                 return 0;
             } else { error(-502); return -502; }
 
-        ///////////////////////////////// Штатные функции
+        ///////////////////////////////// Основные функции
         } else {
             int res = -1;
             for(int i = 1;; ++i) {
@@ -476,7 +476,7 @@ int main(int argc, char *argv[])
                     ++i;
                     if (argv[i] == nullptr) { // Значение параметра не передано
                         error(776);
-                        std::cerr << " Empty value for parameter [" << argv[i-1] << "]" << std::endl;
+                        std::cerr << " Empty value for parameter \"" << argv[i-1] << "\"" << std::endl;
                         return 776;
                     }
 
