@@ -399,10 +399,10 @@ void help()
 {
     std::cout << std::endl << "\
  +--------------------------------------------------------------------------+\n\
- |               Simple Yggdrasil address miner usage:  --help              |\n\
+ |            Simple Yggdrasil address miner usage:  --help or -h           |\n\
  +--------------------------------------------------------------------------+\n\
  [Mining modes]                                                              \n\
-   High addresses (default)                              --high |  -h        \n\
+   High addresses (BY DEFAULT)                                               \n\
    IPv6 by pattern                                         --ip |  -i        \n\
    IPv6 by pattern + height                           --ip-high | -ih        \n\
    IPv6 by regular expression                          --regexp |  -r        \n\
@@ -429,6 +429,15 @@ void help()
  +--------------------------------------------------------------------------+\n";
 }
 
+void without()
+{
+    std::cout << "\
+ SimpleYggGen was started without parameters.\n\
+ The mining mode for high addresses will be launched automatically.\n\
+ Use --help for usage information."
+ << std::flush;
+}
+
 int main(int argc, char *argv[])
 {
     if(argc >= 2)
@@ -436,7 +445,7 @@ int main(int argc, char *argv[])
         std::string p1;
         ///////////////////////////////// Доп. функции конвертации адресов
         p1 = argv[1];
-        if (p1 == "--help" || p1 == "-help" || p1 == "help") {
+        if (p1 == "--help" || p1 == "-help" || p1 == "-h") {
             help();
             return 0;
         } else if (p1 == "--version" || p1 == "-v") {
@@ -478,14 +487,12 @@ int main(int argc, char *argv[])
                     }
                 }
             }
-            intro();
-            displayConfig();
-            testOutput();
-            startThreads();
         }
     }
-    // --help при запуске без параметров.
-    //  Задержка для пользователей, запустивших не через терминал, чтобы увидили окно.
-    else { help(); std::this_thread::sleep_for(std::chrono::hours(1)); }
-    return 0;
+    else { without(); std::this_thread::sleep_for(std::chrono::seconds(1)); }
+
+    intro();
+    displayConfig();
+    testOutput();
+    startThreads();
 }

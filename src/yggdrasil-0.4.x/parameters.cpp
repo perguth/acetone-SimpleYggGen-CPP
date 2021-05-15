@@ -27,7 +27,7 @@ int parameters(option& conf, std::string arg)
 	}
 
 	else if (arg == "--ip"           || arg == "-i" ) conf.mode = 0;
-	else if (arg == "--high"         || arg == "-h" ) conf.mode = 1;
+    else if (arg == "--high"          /* default */ ) conf.mode = 1;
 	else if (arg == "--ip-high"      || arg == "-ih") conf.mode = 2;
 	else if (arg == "--regexp"       || arg == "-r" ) conf.mode = 3;
 	else if (arg == "--regexp-high"  || arg == "-rh") conf.mode = 4;

@@ -49,10 +49,11 @@ std::string getAddress(const Address rawAddr);
 std::string hexArrayToString(const uint8_t* bytes, int length);
 std::string keyToString(const Key key);
 void process_fortune_key(const KeysBox& block);
-void error(int code);
-void help();
 void startThreads();
 template <int T>
 void miner_thread();
+void error(int code);
+void help();
+void without();
 
 #endif // MAIN_H
