@@ -7,16 +7,11 @@ SOURCES += \
         main.cpp \
         parameters.cpp
 
-win32 {
-    LIBS += \
-        -lcrypto \
-        -lpthread \
-        -lws2_32
-}
-!win32 {
-    LIBS += \
+LIBS += \
         -lcrypto \
         -lpthread
+win32 {
+    LIBS += -lws2_32
 }
 
 QMAKE_CXXFLAGS += \
