@@ -34,8 +34,9 @@ void displayConfig()
 {
     // из-за регулирования количества потоков и countsize вызов функции обязателен
     unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
-    if (conf.proc > static_cast<unsigned int>(processor_count))
+    if (conf.proc == 0 || conf.proc > static_cast<unsigned int>(processor_count))
         conf.proc = static_cast<unsigned int>(processor_count);
+
     countsize = 80000 * conf.proc;
 
     std::cout << " Threads: " << conf.proc << ", ";
