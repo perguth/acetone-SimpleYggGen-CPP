@@ -34,8 +34,8 @@ void displayConfig()
 {
     // из-за регулирования количества потоков и countsize вызов функции обязателен
     unsigned int processor_count = std::thread::hardware_concurrency(); // кол-во процессоров
-    if (conf.proc > static_cast<int>(processor_count))
-        conf.proc = static_cast<int>(processor_count);
+    if (conf.proc > static_cast<unsigned int>(processor_count))
+        conf.proc = static_cast<unsigned int>(processor_count);
     countsize = 80000 * conf.proc;
 
     std::cout << " Threads: " << conf.proc << ", ";
@@ -370,7 +370,7 @@ void miner_thread()
 void startThreads()
 {
     std::thread* lastThread;
-    for (int i = 0; i < conf.proc; ++i)
+    for (unsigned int i = 0; i < conf.proc; ++i)
     {
         lastThread = new std::thread(
             conf.mode == 0 ? miner_thread<0> :
