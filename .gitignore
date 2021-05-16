@@ -18,10 +18,7 @@
 
 src/yggdrasil-0.4.x/.qmake.cache
 src/yggdrasil-0.4.x/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
+*.user*
 *.moc
 moc_*.cpp
 qrc_*.cpp

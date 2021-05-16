@@ -106,11 +106,11 @@ void testOutput()
         {
             test.close();
             std::ofstream output(conf.outputfile);
-            output << "********************************************************************\n"
-                   << "Change SigningPublicKey and SigningPrivateKey to your yggdrasil.conf\n"
+            output << "******************************************************\n"
+                   << "Change PublicKey and PrivateKey to your yggdrasil.conf\n"
                    << "Windows: C:\\ProgramData\\Yggdrasil\\yggdrasil.conf\n"
                    << "Debian: /etc/yggdrasil.conf\n"
-                   << "********************************************************************\n";
+                   << "******************************************************\n";
             output.close();
         } else test.close();
     }
@@ -163,9 +163,9 @@ void logKeys(Address raw, const KeysBox keys)
             std::string mesh = getMeshname(raw);
             output << "Domain:            " << pickupMeshnameForOutput(mesh) << std::endl;
         }
-        output << "Address:           " << getAddress(raw) << std::endl;
-        output << "SigningPublicKey:  " << keyToString(keys.PublicKey) << std::endl;
-        output << "SigningPrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
+        output << "Address:    " << getAddress(raw) << std::endl;
+        output << "PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
+        output << "PrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
         output.close();
     }
     mtx.unlock();
