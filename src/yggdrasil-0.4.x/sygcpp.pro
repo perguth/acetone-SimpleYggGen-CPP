@@ -8,7 +8,7 @@ SOURCES += \
         parameters.cpp
 
 LIBS += \
-        -lcrypto \
+        -lsodium \
         -lpthread
 win32 {
     LIBS += -lws2_32

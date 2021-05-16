@@ -9,7 +9,7 @@ set(${PROJECT_NAME}_DEPS
 
 add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
 
-target_link_libraries(${PROJECT_NAME} crypto)
+target_link_libraries(${PROJECT_NAME} sodium)
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} ws2_32)

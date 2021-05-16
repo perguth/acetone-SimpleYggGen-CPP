@@ -1,8 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <openssl/evp.h>
-#include <openssl/bn.h>
+#include <sodium.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>

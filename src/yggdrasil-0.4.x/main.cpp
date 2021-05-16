@@ -245,20 +245,10 @@ bool convertStrToRaw(const std::string str, Address array)
 KeysBox getKeyPair()
 {
     KeysBox keys;
-    size_t len = KEYSIZE;
 
-    // https://github.com/PurpleI2P/i2pd/blob/openssl/libi2pd/Signature.h#L357
-    EVP_PKEY * pkey = nullptr;
-    EVP_PKEY_CTX *pctx = EVP_PKEY_CTX_new_id (EVP_PKEY_ED25519, NULL);
-
-    EVP_PKEY_keygen_init (pctx);
-    EVP_PKEY_keygen (pctx, &pkey);
-    EVP_PKEY_CTX_free (pctx);
-
-    EVP_PKEY_get_raw_public_key (pkey, keys.PublicKey.data(), &len);
-    EVP_PKEY_get_raw_private_key (pkey, keys.PrivateKey.data(), &len);
-
-    EVP_PKEY_free (pkey);
+    uint8_t sk[64];
+    crypto_sign_ed25519_keypair(keys.PublicKey.data(), sk);
+    memcpy(keys.PrivateKey.data(), sk, 32);
 
     return keys;
 }

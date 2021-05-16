@@ -12,7 +12,7 @@ General channels: #howtoygg and #ru
 - Установите необходимые пакеты:
 
 ```bash
-sudo apt-get install cmake git g++ libssl-dev
+sudo apt-get install cmake git g++ libsodium-dev
 ```
 - Клонируйте данный репозиторий:
 
@@ -37,7 +37,7 @@ make
 - Установите необходимые пакеты: 
 
 ```bash
-pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-cmake
+pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-libsodium mingw-w64-x86_64-cmake
 ```
 
 - Клонируйте данный репозиторий:
@@ -65,7 +65,7 @@ Starting with version 0.4.0 Yggdrasil Network uses the new IPv6 address generati
 - Install required packages: 
 
 ```bash
-sudo apt-get install cmake git g++ libssl-dev
+sudo apt-get install cmake git g++ libsodium-dev
 ```
 
 - Clone this repository:
@@ -91,7 +91,7 @@ make
 - Install required packages: 
 
 ```bash
-pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-openssl mingw-w64-x86_64-cmake
+pacman -S make git mingw-w64-x86_64-gcc mingw-w64-x86_64-libsodium mingw-w64-x86_64-cmake
 ```
 
 - Clone this repository:
