@@ -7,12 +7,14 @@ set(${PROJECT_NAME}_DEPS
     ${${PROJECT_NAME}_HEADERS}
 )
 
-add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
-
 target_link_libraries(${PROJECT_NAME} sodium)
 
 if(WIN32)
+    add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS} windows/resource.rc)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -static")
     target_link_libraries(${PROJECT_NAME} ws2_32)
 else()
+    add_executable(${PROJECT_NAME} ${${PROJECT_NAME}_DEPS})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
     target_link_libraries(${PROJECT_NAME} pthread)
 endif()
