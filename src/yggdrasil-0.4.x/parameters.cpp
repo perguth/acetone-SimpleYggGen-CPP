@@ -27,7 +27,6 @@ int parameters(option& conf, std::string arg)
 	}
 
 	else if (arg == "--ip"           || arg == "-i" ) conf.mode = 0;
-    else if (arg == "--high"          /* default */ ) conf.mode = 1;
 	else if (arg == "--ip-high"      || arg == "-ih") conf.mode = 2;
 	else if (arg == "--regexp"       || arg == "-r" ) conf.mode = 3;
 	else if (arg == "--regexp-high"  || arg == "-rh") conf.mode = 4;
@@ -35,9 +34,10 @@ int parameters(option& conf, std::string arg)
 	else if (arg == "--mesh-regexp"  || arg == "-mr") conf.mode = 6;
 	else if (arg == "--brute-force"  || arg == "-b" ) conf.mode = 7;
 
-	else if (arg == "--increase-none") conf.letsup = false;
-	else if (arg == "--logging-none")  conf.log    = false;
-	else if (arg == "--display-mesh")  conf.mesh   = true;
+    else if (arg == "--increase-none" || arg == "-in") conf.letsup   = false;
+    else if (arg == "--logging-none"  || arg == "-ln") conf.log      = false;
+    else if (arg == "--display-mesh"  || arg == "-dm") conf.mesh     = true;
+    else if (arg == "--full-pk"       || arg == "-fp") conf.fullkeys = true;
 
 	else if (arg == "--threads"  || arg == "-t") return 777; // Параметры, требующие значение
 	else if (arg == "--pattern"  || arg == "-p") return 777;

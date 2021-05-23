@@ -154,8 +154,12 @@ void logKeys(Address raw, const KeysBox keys)
     }
     std::cout << " Address:    " << getAddress(raw) << std::endl;
     std::cout << " PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
-    std::cout << " PrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
-    std::cout << std::endl;
+    std::cout << " PrivateKey: " << keyToString(keys.PrivateKey);
+
+    // Можем выводить приватный ключ в консоль в полном формате
+    if (!conf.log || conf.fullkeys) std::cout << keyToString(keys.PublicKey);
+
+    std::cout << std::endl << std::endl;
 
     if (conf.log) // запись в файл
     {
@@ -491,23 +495,24 @@ void help()
  |            Simple Yggdrasil address miner usage:  --help or -h           |\n\
  +--------------------------------------------------------------------------+\n\
  [Mining modes]                                                              \n\
-   High addresses (BY DEFAULT)                                               \n\
-   IPv6 by pattern                                         --ip |  -i        \n\
+   High addresses                                    BY DEFAULT |            \n\
+   IPv6 by pattern                                         --ip | -i         \n\
    IPv6 by pattern + height                           --ip-high | -ih        \n\
-   IPv6 by regular expression                          --regexp |  -r        \n\
+   IPv6 by regular expression                          --regexp | -r         \n\
    IPv6 by regular expression + height            --regexp-high | -rh        \n\
-   Meshname by pattern                                   --mesh |  -m        \n\
+   Meshname by pattern                                   --mesh | -m         \n\
    Meshname by regular expression                 --mesh-regexp | -mr        \n\
-   Subnet brute force (300::/64)                  --brute-force |  -b        \n\
+   Subnet brute force (300::/64)                  --brute-force | -b         \n\
  [Main parameters]                                                           \n\
-   Threads count (maximum by default)                 --threads |  -t <value>\n\
-   String for pattern or regular expression           --pattern |  -p <value>\n\
-   Start position for high addresses (14 by default) --altitude |  -a <value>\n\
+   Threads count (maximum by default)                 --threads | -t  <value>\n\
+   String for pattern or regular expression           --pattern | -p  <value>\n\
+   Start position for high addresses (14 by default) --altitude | -a  <value>\n\
  [Extra options]                                                             \n\
-   Disable auto-increase in high mode           --increase-none |            \n\
-   Disable logging to text file, stdout only     --logging-none |            \n\
-   Force display meshname domains                --display-mesh |            \n\
-   Displays the version of the miner                  --version |  -v        \n\
+   Disable auto-increase in high mode           --increase-none | -in        \n\
+   Disable logging to text file, stdout only     --logging-none | -ln        \n\
+   Force display meshname domains                --display-mesh | -dm        \n\
+   Show PrivateKeys in full format in console         --full-pk | -fp        \n\
+   Show the version of the miner                      --version | -v         \n\
  [Meshname convertation]                                                     \n\
    Convert IP to Meshname                              --tomesh | -tm <value>\n\
    Convert Meshname to IP                                --toip | -ti <value>\n\
