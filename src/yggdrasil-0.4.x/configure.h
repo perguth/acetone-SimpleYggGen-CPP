@@ -15,7 +15,7 @@ struct option
     std::string str   = "aaaa";
 
 	std::string outputfile;
-    int sbt_size = 7;           // 64 бита / 8 = 8 байт, нумерация с нуля
+    int sbt_size   = 7;         // 64b/8 = 8B, нумерация с нуля
     bool sbt_alarm = false;     // для симпатичного вывода предупреждения
 };
 

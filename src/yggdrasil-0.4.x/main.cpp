@@ -68,7 +68,7 @@ void displayConfig()
     else if(conf.mode == 6)
         std::cout << "meshname regexp (" << conf.str << "), ";
     else if(conf.mode == 7)
-        std::cout << "subnet brute force (" << conf.str << "/64), ";
+        std::cout << "subnet brute force (" << conf.str << "/" << (conf.sbt_size+1) * 8 << "), ";
 
     if(conf.log)
         std::cout << "logging to text file.";
@@ -120,6 +120,7 @@ void logStatistics()
 {
     if (totalcount % countsize == 0)
     {
+        mtx.lock();
         auto timedays = (std::time(NULL) - sygstartedin) / 86400;
         auto timehours = ((std::time(NULL) - sygstartedin) - (timedays * 86400)) / 3600;
         auto timeminutes = ((std::time(NULL) - sygstartedin) - (timedays * 86400) - (timehours * 3600)) / 60;
@@ -135,6 +136,7 @@ void logStatistics()
             "] Time: [" << timedays << ":" << std::setw(2) << std::setfill('0') <<
             timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds << "]" << std::endl;
         newline = true;
+        mtx.unlock();
     }
 }
 
@@ -161,7 +163,7 @@ void logKeys(Address raw, const KeysBox keys)
         output << std::endl;
         if (conf.mesh) {
             std::string mesh = getMeshname(raw);
-            output << "Domain:            " << pickupMeshnameForOutput(mesh) << std::endl;
+            output << "Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
         }
         output << "Address:    " << getAddress(raw) << std::endl;
         output << "PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
@@ -230,16 +232,19 @@ std::string decodeMeshToIP(const std::string str)
     return std::string(getAddress(rawAddr));
 }
 
-void subnetCheck()
+bool subnetCheck() // замена 300::/64 на целевой 200::/7
 {
-    if(conf.str[0] == '3') // замена 300::/64 на целевой 200::/7
+    if(conf.str[0] == '3')
+    {
         conf.str[0] = '2';
+        return true;
+    }
+    return false;
 }
 
-bool convertStrToRaw(const std::string str, Address array)
+bool convertStrToRaw(const std::string str, Address& array)
 {
-    bool result = inet_pton(AF_INET6, str.c_str(), (void*)array.data());
-    return result;
+    return inet_pton(AF_INET6, str.c_str(), (void*)array.data());
 }
 
 KeysBox getKeyPair()
@@ -283,15 +288,15 @@ Key bitwiseInverse(const Key key)
 
 int getOnes(const Key value)
 {
-    const int map[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
-    int lOnes = 0; // кол-во лидирующих единиц
+    const int zeroBytesMap[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
+    int leadOnes = 0; // кол-во лидирующих единиц
 
     for (int i = 0; i < 17; ++i) // 32B(ключ) - 15B(IPv6 без 0x02) = 17B(возможных лидирующих единиц)
     {
         for (int j = 0; j < 8; ++j)
         {
-            if (value[i] & map[j]) ++lOnes;
-            else return lOnes;
+            if (value[i] & zeroBytesMap[j]) ++leadOnes;
+            else return leadOnes;
         }
     }
     return 0; // никогда не случится
@@ -330,16 +335,48 @@ void process_fortune_key(const KeysBox& keys)
 template <int T>
 void miner_thread()
 {
-    //Address rawAddr;
+    if (T == 4 || T == 5) // meshname pattern
+    {
+        conf.str = pickupStringForMeshname(conf.str);
+    }
+    Address rawForBrute;
+    if (T == 7) // subnet brute force
+    {
+        mtx.lock();
+        std::string oldString = conf.str;
+        bool edited = subnetCheck();
+        bool result = convertStrToRaw(conf.str, rawForBrute);
+        if (!result || edited || conf.str != getAddress(rawForBrute))
+        {
+            if (!conf.sbt_alarm) // однократный вывод ошибки
+            {
+                std::cerr << " WARNING: Your string [" << oldString << "] converted to IP [" <<
+                getAddress(rawForBrute) << "]" << std::endl << std::endl;
+            }
+            conf.sbt_alarm = true;
+        }
+        mtx.unlock();
+    }
+
+    Address rawAddr;
+    std::regex regx(conf.str, std::regex_constants::egrep);
     int ones = 0;
 
-    for (;;)
+    for (;;) // основной цикл майнинга
     {
         auto start_time = std::chrono::steady_clock::now();
         KeysBox keys = getKeyPair();
         Key invKey = bitwiseInverse(keys.PublicKey);
         ones = getOnes(invKey);
 
+        if (T == 0) // IPv6 pattern mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (getAddress(rawAddr).find(conf.str.c_str()) != std::string::npos)
+            {
+                process_fortune_key(keys);
+            }
+        }
         if (T == 1) // high mining
         {
             if (ones > conf.high)
@@ -347,14 +384,75 @@ void miner_thread()
                 if (conf.letsup != 0) conf.high = ones;
                 process_fortune_key(keys);
             }
-        } else { std::cout << "Only high mode implemented yet" << std::endl; break; } // FIXME
+        }
+        if (T == 2) // pattern & high mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (ones > conf.high && getAddress(rawAddr).find(conf.str.c_str()) != std::string::npos)
+            {
+                if (conf.letsup != 0) conf.high = ones;
+                process_fortune_key(keys);
+            }
+        }
+        if (T == 3) // IPv6 regexp mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (std::regex_search((getAddress(rawAddr)), regx))
+            {
+                process_fortune_key(keys);
+            }
+        }
+        if (T == 4) // IPv6 regexp & high mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (ones > conf.high)
+            {
+                if (std::regex_search((getAddress(rawAddr)), regx))
+                {
+                    if (conf.letsup != 0) conf.high = ones;
+                    process_fortune_key(keys);
+                }
+            }
+        }
+        if (T == 5) // meshname pattern mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (getMeshname(rawAddr).find(conf.str.c_str()) != std::string::npos)
+            {
+                process_fortune_key(keys);
+            }
+        }
+        if (T == 6) // meshname regexp mining
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            if (std::regex_search((getMeshname(rawAddr)), regx))
+            {
+                process_fortune_key(keys);
+            }
+        }
+        if (T == 7) // subnet brute force
+        {
+            getRawAddress(ones, invKey, rawAddr);
+            for(int z = 0; rawForBrute[z] == rawAddr[z]; ++z)
+            {
+                if (z > 4)
+                {
+                    if (z == conf.sbt_size) process_fortune_key(keys);
+                    else
+                    {
+                        mtx.lock();
+                        std::cout << " So close! Bruted bytes: " << z+1
+                                  << "/" << conf.sbt_size+1 << std::endl;
+                        mtx.unlock();
+                    }
+                }
+            }
+        }
 
         auto stop_time = std::chrono::steady_clock::now();
         ++totalcount;
-        mtx.lock();
         blocks_duration += stop_time - start_time;
         logStatistics();
-        mtx.unlock();
     }
 }
 
