@@ -5,7 +5,7 @@ Yggdrasil    324:9de3:fea4:f6ac::41    6667
 General channels: #howtoygg and #ru
 ```
 
-## Майнер адресов сети Yggdrasil на C++
+## Майнер адресов сети Yggdrasil
 Начиная с версии 0.4.0 Yggdrasil Network использует новый алгоритм генерации IPv6-адресов. С версии **5.0** SimpleYggGen поддерживает только новый алгоритм. [Wiki](http://[300:529f:150c:eafe::6]/doku.php?id=yggdrasil:simpleygggen_cpp).
 
 #### Сборка на Linux
@@ -57,7 +57,7 @@ mingw32-make
 
 - Запустите бинарный файл `sygcpp.exe`
 
-## Yggdrasil Network address miner in C++ 
+## Yggdrasil Network address miner 
 
 Starting with version 0.4.0 Yggdrasil Network uses the new IPv6 address generation algorithm. Since version **5.0**, SimpleYggGen only supports the new algorithm.
 
