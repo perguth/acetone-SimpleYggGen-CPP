@@ -544,6 +544,7 @@ int main(int argc, char *argv[])
             return 0;
         } else if (p1 == "--version" || p1 == "-v") {
             intro();
+            return 0;
         } else if (p1 == "--tomesh" || p1 == "-tm") { // преобразование IP -> Meshname
             if (argc >= 3) {
                 Address rawAddr;
