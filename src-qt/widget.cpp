@@ -36,7 +36,7 @@ Widget::Widget(QWidget *parent)
     {
         c->setText("https://notabug.org/acetone/SimpleYggGen-CPP");
         ui->notabugLink->setText("Сopied to clipboard");
-        std::thread (&Widget::restoreNotABugLinkButton, this); // TODO async
+        std::thread (&Widget::restoreNotABugLinkButton, this).detach(); // TODO async
     });
 }
 
