@@ -339,7 +339,7 @@ void process_fortune_key(const KeysBox& keys)
 template <int T>
 void miner_thread()
 {
-    if (T == 4 || T == 5) // meshname pattern
+    if (T == 5) // meshname pattern
     {
         conf.str = pickupStringForMeshname(conf.str);
     }
