@@ -162,6 +162,11 @@ void Widget::string_status(bool b)
 
 void Widget::start()
 {
+    if (ui->stringSet->text() == "" && m_mode != 1) {
+        ui->stringSet->setPlaceholderText("???");
+        return;
+    }
+
     ui->frame->hide();
     ui->frame_2->show();
     ui->frame_2->setGeometry(10, 10, 491, 161);
