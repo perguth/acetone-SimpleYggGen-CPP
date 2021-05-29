@@ -179,7 +179,7 @@ void Widget::start()
     conf.letsup = !ui->disableIncrease->isChecked();
 
     ui->path->setText(QDir::currentPath());
-
+    ui->label->setToolTip("acetone@i2pmail.org");
     widgetForMiner = this;
     std::thread(make_miner).detach();
 }
@@ -193,8 +193,12 @@ void Widget::stop()
 
 void Widget::changeBanner()
 {
-    QPixmap adBanner;
-    adBanner.load("ad.png");
-    QFile::remove("ad.png");
-    ui->label->setPixmap(adBanner);
+    QFile banner("ad.png");
+    if (banner.size() > 5)
+    {
+        QPixmap adBanner;
+        adBanner.load("ad.png");
+        ui->label->setPixmap(adBanner);
+    }
+    banner.remove();
 }

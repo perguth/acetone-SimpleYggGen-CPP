@@ -285,6 +285,15 @@
       <height>51</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string notr="true"/>
+    </property>
+    <property name="toolTipDuration">
+     <number>-1</number>
+    </property>
+    <property name="statusTip">
+     <string/>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -731,9 +740,9 @@
   <widget class="QPushButton" name="notabugLink">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>240</x>
      <y>170</y>
-     <width>271</width>
+     <width>261</width>
      <height>20</height>
     </rect>
    </property>
@@ -745,6 +754,9 @@
    </property>
    <property name="cursor">
     <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
    </property>
    <property name="text">
     <string>NotABug.org/acetone/SimpleYggGen-CPP</string>
