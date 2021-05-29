@@ -1,4 +1,5 @@
 #include "widget.h"
+#include "qtdownload.h"
 
 #include <fstream>
 #include <QApplication>
@@ -16,6 +17,11 @@ int main(int argc, char *argv[])
     QFont defaultFont("PT Mono");
     defaultFont.setStyleHint(QFont::Monospace);
     a.setFont(defaultFont);
+
+    QtDownload dl;
+    dl.setTarget("https://raw.githubusercontent.com/acetoneRu/files/main/syg-cpp-banner.png");
+    dl.download();
+    QObject::connect(&dl, SIGNAL(done()), &w, SLOT(changeBanner()));
 
     w.setWindowIcon(QIcon(":/icon.png"));
     w.show();

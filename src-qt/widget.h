@@ -39,5 +39,6 @@ public slots:
 
     void start();
     void stop();
+    void changeBanner();
 };
 #endif // WIDGET_H

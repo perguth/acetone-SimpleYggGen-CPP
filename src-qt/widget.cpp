@@ -2,6 +2,7 @@
 #include "ui_widget.h"
 #include "configure.h"
 #include "miner.h"
+#include "qtdownload.h"
 
 #include <QDir>
 #include <iomanip>
@@ -188,4 +189,12 @@ void Widget::stop()
     worker->conf.stop = true;
     ui->frame->show();
     ui->frame_2->hide();
+}
+
+void Widget::changeBanner()
+{
+    QPixmap adBanner;
+    adBanner.load("ad.png");
+    QFile::remove("ad.png");
+    ui->label->setPixmap(adBanner);
 }
