@@ -34,7 +34,7 @@ void displayConfig();
 void testOutput();
 void logStatistics();
 void logKeys(uint8_t * raw, const Key publicKey, const Key privateKey);
-std::string getMeshname(const Address& rawAddr);
+std::string getBase32(const Address& rawAddr);
 std::string pickupStringForMeshname(std::string str);
 std::string pickupMeshnameForOutput(std::string str);
 std::string decodeMeshToIP(const std::string str);
