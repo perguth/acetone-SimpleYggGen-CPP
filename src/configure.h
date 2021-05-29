@@ -15,7 +15,7 @@ struct option
     bool fullkeys     = false;  // отображение секретного ключа в консоли в полном формате
     std::string str   = "aaaa";
 
-	std::string outputfile;
+    std::string outputfile;
     int sbt_size   = 7;         // 64b/8 = 8B, нумерация с нуля
     bool sbt_alarm = false;     // для симпатичного вывода предупреждения
 };
