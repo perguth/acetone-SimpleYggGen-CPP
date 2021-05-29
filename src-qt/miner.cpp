@@ -5,10 +5,35 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
 {
     conf = window->conf;
     conf.stop = false;
-    countsize = 40000 * conf.proc;
+    countsize = 20000 * conf.proc; // Периодичность обновления счетчиков
+
+    conf.mode == 0 ? conf.outputfile = "syg-ipv6-pattern.txt" :
+    conf.mode == 1 ? conf.outputfile = "syg-ipv6-high.txt" :
+    conf.mode == 2 ? conf.outputfile = "syg-ipv6-pattern-high.txt" :
+    conf.mode == 3 ? conf.outputfile = "syg-ipv6-regexp.txt":
+    conf.mode == 4 ? conf.outputfile = "syg-ipv6-regexp-high.txt" :
+    conf.mode == 5 ? conf.outputfile = "syg-meshname-pattern.txt" :
+        /* 6 */      conf.outputfile = "syg-meshname-regexp.txt" ;
 
     testOutput();
-    window->setAddr("miner started");
+    if (conf.mode == 3 || conf.mode == 4 || conf.mode == 6) // регулярки
+    {
+        if (conf.str.front() != '"' || conf.str.back() != '"')
+            conf.str = '"' + conf.str + '"';
+
+        if (conf.mode == 6) { // поиск по сырому base32, где конец - это паддинг "====".
+            for (auto it = conf.str.begin(); it != conf.str.end(); ++it)
+                if (*it == '$') *it = '=';
+        }
+    }
+
+    if (conf.mode == 5) // meshname pattern
+    {
+        conf.str = pickupStringForMeshname(conf.str);
+    }
+
+    window->setLog("00:00:00:00", 0, 0, 0);
+    window->setAddr("<last address will be here>");
 }
 
 void miner::testOutput()
@@ -41,8 +66,8 @@ void miner::logStatistics()
         uint64_t khs = conf.proc * countsize / df.count();
 
         std::stringstream ss;
-        ss << timedays << ":" << std::setw(2) << std::setfill('0') <<
-            timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds;
+        ss << std::setw(2) << std::setfill('0') << timedays << ":" << std::setw(2) << std::setfill('0')
+           << timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds;
 
         mtx.lock();
         window->setLog(ss.str(), totalcount, countfortune, khs);
@@ -54,15 +79,15 @@ void miner::logKeys(Address raw, const KeysBox keys)
 {
     mtx.lock();
 
-    std::string mesh = getMeshname(raw);
+    std::string base32 = getBase32(raw);
     if (conf.mode == 5 || conf.mode == 6) {
-        window->setAddr(pickupMeshnameForOutput(mesh));
+        window->setAddr(pickupMeshnameForOutput(base32));
     }
     else window->setAddr(getAddress(raw));
 
     std::ofstream output(conf.outputfile, std::ios::app);
     output << std::endl;
-    output << "Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
+    output << "Domain:     " << pickupMeshnameForOutput(base32) << std::endl;
     output << "Address:    " << getAddress(raw) << std::endl;
     output << "PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
     output << "PrivateKey: " << keyToString(keys.PrivateKey) << keyToString(keys.PublicKey) << std::endl;
@@ -71,7 +96,7 @@ void miner::logKeys(Address raw, const KeysBox keys)
     mtx.unlock();
 }
 
-std::string miner::getMeshname(const Address& rawAddr)
+std::string miner::getBase32(const Address& rawAddr)
 {
     return static_cast<std::string>(cppcodec::base32_rfc4648::encode(rawAddr.data(), 16));
 }
@@ -204,18 +229,14 @@ void miner::process_fortune_key(const KeysBox& keys)
 
 void miner::miner_thread()
 {
-    if (conf.mode == 4 || conf.mode == 5) // meshname pattern
-    {
-        conf.str = pickupStringForMeshname(conf.str);
-    }
-
     Address rawAddr;
-    std::regex regx(conf.str, std::regex_constants::egrep);
+    std::regex regx(conf.str, std::regex_constants::egrep | std::regex_constants::icase);
     int ones = 0;
 
     for (;;) // основной цикл майнинга
     {
         if (conf.stop) break;
+
         auto start_time = std::chrono::steady_clock::now();
         KeysBox keys = getKeyPair();
         Key invKey = bitwiseInverse(keys.PublicKey);
@@ -269,7 +290,7 @@ void miner::miner_thread()
         if (conf.mode == 5) // meshname pattern mining
         {
             getRawAddress(ones, invKey, rawAddr);
-            if (getMeshname(rawAddr).find(conf.str.c_str()) != std::string::npos)
+            if (getBase32(rawAddr).find(conf.str.c_str()) != std::string::npos)
             {
                 process_fortune_key(keys);
             }
@@ -277,7 +298,7 @@ void miner::miner_thread()
         if (conf.mode == 6) // meshname regexp mining
         {
             getRawAddress(ones, invKey, rawAddr);
-            if (std::regex_search((getMeshname(rawAddr)), regx))
+            if (std::regex_search((getBase32(rawAddr)), regx))
             {
                 process_fortune_key(keys);
             }

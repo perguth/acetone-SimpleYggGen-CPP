@@ -45,7 +45,7 @@ private:
     void testOutput();
     void logStatistics();
     void logKeys(Address raw, const KeysBox keys);
-    std::string getMeshname(const Address& rawAddr);
+    std::string getBase32(const Address& rawAddr);
     std::string pickupStringForMeshname(std::string str);
     std::string pickupMeshnameForOutput(std::string str);
     std::string keyToString(const Key key);

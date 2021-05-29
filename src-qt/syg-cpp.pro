@@ -29,11 +29,13 @@ RESOURCES += \
 
 LIBS += \
     -lsodium \
-    -lpthread
+    -lpthread \
+
 
 win32 {
-    LIBS += -lws2_32
-    RC_FILE += ../src/windows/resource.rc
-    OTHER_FILES += ../src/windows/resource.rc
-}
+LIBS += \
+    -lws2_32
 
+RC_FILE += ../src/windows/resource.rc
+OTHER_FILES += ../src/windows/resource.rc
+}

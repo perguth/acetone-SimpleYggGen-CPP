@@ -3,6 +3,7 @@
 #include "configure.h"
 #include "miner.h"
 
+#include <QDir>
 #include <iomanip>
 #include <thread>
 #include <sstream>
@@ -24,7 +25,7 @@ void make_miner()
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    ui->frame_2->setDisabled(true);
+    ui->frame_2->hide();
 
     unsigned int processor_count = std::thread::hardware_concurrency();
     ui->threads->setMaximum(processor_count);
@@ -39,6 +40,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->ipv6_reg_mode, SIGNAL(clicked()), this, SLOT(ipv6_reg_mode()));
     QObject::connect(ui->ipv6_reg_high_mode, SIGNAL(clicked()), this, SLOT(ipv6_reg_high_mode()));
     QObject::connect(ui->mesh_pat_mode, SIGNAL(clicked()), this, SLOT(mesh_pat_mode()));
+    QObject::connect(ui->mesh_reg_mode, SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
 
     QObject::connect(ui->stop, SIGNAL(clicked()), this, SLOT(stop()));
 
@@ -58,9 +60,12 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
 {
     ui->time->setText(tm.c_str());                  // время
-    ui->total->setText(std::to_string(tt).c_str()); // всего
-    ui->found->setText(std::to_string(f).c_str());  // найдено
+    ui->total->setText(std::to_string(tt).c_str()); // общий счетчик
+    ui->found->setText(std::to_string(f).c_str());  // общий счетчик
     ui->khs->setText(std::to_string(k).c_str());    // скорость
+
+    std::string hs = std::to_string(k*1000) + " per second";
+    ui->hs->setText(hs.c_str());
 }
 
 void Widget::setAddr(std::string address)
@@ -157,8 +162,9 @@ void Widget::string_status(bool b)
 
 void Widget::start()
 {
-    ui->frame->setDisabled(true);
-    ui->frame_2->setDisabled(false);
+    ui->frame->hide();
+    ui->frame_2->show();
+    ui->frame_2->setGeometry(10, 10, 491, 161);
 
     conf.mode   = m_mode;
     conf.proc   = ui->threads->value();
@@ -174,6 +180,7 @@ void Widget::start()
     conf.mode == 5 ? conf.outputfile = "syg-meshname-pattern.txt" :
         /* 6 */      conf.outputfile = "syg-meshname-regexp.txt";
 
+    ui->path->setText(QDir::currentPath());
 
     widgetForMiner = this;
     std::thread(make_miner).detach();
@@ -182,6 +189,6 @@ void Widget::start()
 void Widget::stop()
 {
     worker->conf.stop = true;
-    ui->frame->setDisabled(false);
-    ui->frame_2->setDisabled(true);
+    ui->frame->show();
+    ui->frame_2->hide();
 }
