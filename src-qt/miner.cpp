@@ -16,6 +16,7 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
         /* 6 */      conf.outputfile = "syg-meshname-regexp.txt" ;
 
     testOutput();
+
     if (conf.mode == 3 || conf.mode == 4 || conf.mode == 6) // регулярки
     {
         if (conf.str.front() != '"' || conf.str.back() != '"')
@@ -80,10 +81,8 @@ void miner::logKeys(Address raw, const KeysBox keys)
     mtx.lock();
 
     std::string base32 = getBase32(raw);
-    if (conf.mode == 5 || conf.mode == 6) {
-        window->setAddr(pickupMeshnameForOutput(base32));
-    }
-    else window->setAddr(getAddress(raw));
+    if (conf.mode == 5 || conf.mode == 6) window->setAddr(pickupMeshnameForOutput(base32));
+    else                                  window->setAddr(getAddress(raw));
 
     std::ofstream output(conf.outputfile, std::ios::app);
     output << std::endl;
@@ -154,7 +153,7 @@ std::string miner::hexArrayToString(const uint8_t* bytes, int length)
     return ss.str();
 }
 
-std::string miner::getAddress(const Address rawAddr)
+std::string miner::getAddress(const Address& rawAddr)
 {
     char ipStrBuf[46];
     inet_ntop(AF_INET6, rawAddr.data(), ipStrBuf, 46);
@@ -313,11 +312,10 @@ void miner::miner_thread()
 
 void miner::startThreads()
 {
-    std::thread* lastThread;
     for (unsigned int i = 0; i < conf.proc; ++i)
     {
-        lastThread = new std::thread(&miner::miner_thread, this);
-        if (i+1 < conf.proc) lastThread->detach();
+        std::thread * thread = new std::thread(&miner::miner_thread, this);
+        if (i+1 < conf.proc) thread->detach();
+        else thread->join();
     }
-    lastThread->join();
 }

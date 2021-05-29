@@ -50,7 +50,7 @@ private:
     std::string pickupMeshnameForOutput(std::string str);
     std::string keyToString(const Key key);
     std::string hexArrayToString(const uint8_t* bytes, int length);
-    std::string getAddress(const Address rawAddr);
+    std::string getAddress(const Address& rawAddr);
     KeysBox getKeyPair();
     void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr);
     Key bitwiseInverse(const Key key);
