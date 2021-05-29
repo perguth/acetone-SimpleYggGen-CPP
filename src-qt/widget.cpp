@@ -172,14 +172,6 @@ void Widget::start()
     conf.str    = ui->stringSet->text().toStdString();
     conf.letsup = !ui->disableIncrease->isChecked();
 
-    conf.mode == 0 ? conf.outputfile = "syg-ipv6-pattern.txt" :
-    conf.mode == 1 ? conf.outputfile = "syg-ipv6-high.txt" :
-    conf.mode == 2 ? conf.outputfile = "syg-ipv6-pattern-high.txt" :
-    conf.mode == 3 ? conf.outputfile = "syg-ipv6-regexp.txt":
-    conf.mode == 4 ? conf.outputfile = "syg-ipv6-regexp-high.txt" :
-    conf.mode == 5 ? conf.outputfile = "syg-meshname-pattern.txt" :
-        /* 6 */      conf.outputfile = "syg-meshname-regexp.txt";
-
     ui->path->setText(QDir::currentPath());
 
     widgetForMiner = this;
