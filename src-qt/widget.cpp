@@ -7,6 +7,7 @@
 #include <thread>
 #include <sstream>
 #include <future>
+#include <iostream>
 #include <QString>
 #include <QClipboard>
 
@@ -163,16 +164,16 @@ void Widget::start()
     conf.proc   = ui->threads->value();
     conf.high   = ui->height->value();
     conf.str    = ui->stringSet->text().toStdString();
-    conf.letsup = ui->disableIncrease->isChecked();
+    conf.letsup = !ui->disableIncrease->isChecked();
 
-    if      (conf.mode == 0) conf.outputfile = "syg-ipv6-pattern.txt";
-    else if (conf.mode == 1) conf.outputfile = "syg-ipv6-high.txt";
-    else if (conf.mode == 2) conf.outputfile = "syg-ipv6-pattern-high.txt";
-    else if (conf.mode == 3) conf.outputfile = "syg-ipv6-regexp.txt";
-    else if (conf.mode == 4) conf.outputfile = "syg-ipv6-regexp-high.txt";
-    else if (conf.mode == 5) conf.outputfile = "syg-meshname-pattern.txt";
-    else if (conf.mode == 6) conf.outputfile = "syg-meshname-regexp.txt";
-    else if (conf.mode == 7) conf.outputfile = "syg-subnet-brute-force.txt";
+    conf.mode == 0 ? conf.outputfile = "syg-ipv6-pattern.txt" :
+    conf.mode == 1 ? conf.outputfile = "syg-ipv6-high.txt" :
+    conf.mode == 2 ? conf.outputfile = "syg-ipv6-pattern-high.txt" :
+    conf.mode == 3 ? conf.outputfile = "syg-ipv6-regexp.txt":
+    conf.mode == 4 ? conf.outputfile = "syg-ipv6-regexp-high.txt" :
+    conf.mode == 5 ? conf.outputfile = "syg-meshname-pattern.txt" :
+        /* 6 */      conf.outputfile = "syg-meshname-regexp.txt";
+
 
     widgetForMiner = this;
     std::thread(make_miner).detach();

@@ -5,7 +5,7 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
 {
     conf = window->conf;
     conf.stop = false;
-    countsize = 80000 * conf.proc;
+    countsize = 40000 * conf.proc;
 
     testOutput();
     window->setAddr("miner started");
@@ -31,7 +31,6 @@ void miner::logStatistics()
 {
     if (totalcount % countsize == 0)
     {
-        mtx.lock();
         auto timedays = (std::time(NULL) - sygstartedin) / 86400;
         auto timehours = ((std::time(NULL) - sygstartedin) - (timedays * 86400)) / 3600;
         auto timeminutes = ((std::time(NULL) - sygstartedin) - (timedays * 86400) - (timehours * 3600)) / 60;
@@ -45,6 +44,7 @@ void miner::logStatistics()
         ss << timedays << ":" << std::setw(2) << std::setfill('0') <<
             timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds;
 
+        mtx.lock();
         window->setLog(ss.str(), totalcount, countfortune, khs);
         mtx.unlock();
     }
@@ -56,7 +56,7 @@ void miner::logKeys(Address raw, const KeysBox keys)
 
     std::string mesh = getMeshname(raw);
     if (conf.mode == 5 || conf.mode == 6) {
-        window->setAddr(mesh);
+        window->setAddr(pickupMeshnameForOutput(mesh));
     }
     else window->setAddr(getAddress(raw));
 
@@ -233,7 +233,7 @@ void miner::miner_thread()
         {
             if (ones > conf.high)
             {
-                if (conf.letsup != false) conf.high = ones;
+                if (conf.letsup) conf.high = ones;
                 process_fortune_key(keys);
             }
         }
@@ -242,7 +242,7 @@ void miner::miner_thread()
             getRawAddress(ones, invKey, rawAddr);
             if (ones > conf.high && getAddress(rawAddr).find(conf.str.c_str()) != std::string::npos)
             {
-                if (conf.letsup != 0) conf.high = ones;
+                if (conf.letsup) conf.high = ones;
                 process_fortune_key(keys);
             }
         }
@@ -261,7 +261,7 @@ void miner::miner_thread()
             {
                 if (std::regex_search((getAddress(rawAddr)), regx))
                 {
-                    if (conf.letsup != 0) conf.high = ones;
+                    if (conf.letsup) conf.high = ones;
                     process_fortune_key(keys);
                 }
             }
