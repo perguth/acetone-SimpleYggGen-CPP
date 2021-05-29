@@ -149,8 +149,8 @@ void logKeys(Address raw, const KeysBox keys)
         newline = false;
     }
     if (conf.mesh) {
-        std::string mesh = getMeshname(raw);
-        std::cout << " Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
+        std::string base32 = getBase32(raw);
+        std::cout << " Domain:     " << pickupMeshnameForOutput(base32) << std::endl;
     }
     std::cout << " Address:    " << getAddress(raw) << std::endl;
     std::cout << " PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
@@ -166,8 +166,8 @@ void logKeys(Address raw, const KeysBox keys)
         std::ofstream output(conf.outputfile, std::ios::app);
         output << std::endl;
         if (conf.mesh) {
-            std::string mesh = getMeshname(raw);
-            output << "Domain:     " << pickupMeshnameForOutput(mesh) << std::endl;
+            std::string base32 = getBase32(raw);
+            output << "Domain:     " << pickupMeshnameForOutput(base32) << std::endl;
         }
         output << "Address:    " << getAddress(raw) << std::endl;
         output << "PublicKey:  " << keyToString(keys.PublicKey) << std::endl;
@@ -177,7 +177,7 @@ void logKeys(Address raw, const KeysBox keys)
     mtx.unlock();
 }
 
-std::string getMeshname(const Address& rawAddr)
+std::string getBase32(const Address& rawAddr)
 {
     return static_cast<std::string>(cppcodec::base32_rfc4648::encode(rawAddr.data(), 16));
 }
@@ -421,7 +421,7 @@ void miner_thread()
         if (T == 5) // meshname pattern mining
         {
             getRawAddress(ones, invKey, rawAddr);
-            if (getMeshname(rawAddr).find(conf.str.c_str()) != std::string::npos)
+            if (getBase32(rawAddr).find(conf.str.c_str()) != std::string::npos)
             {
                 process_fortune_key(keys);
             }
@@ -429,7 +429,7 @@ void miner_thread()
         if (T == 6) // meshname regexp mining
         {
             getRawAddress(ones, invKey, rawAddr);
-            if (std::regex_search((getMeshname(rawAddr)), regx))
+            if (std::regex_search((getBase32(rawAddr)), regx))
             {
                 process_fortune_key(keys);
             }
@@ -549,8 +549,8 @@ int main(int argc, char *argv[])
             if (argc >= 3) {
                 Address rawAddr;
                 convertStrToRaw(argv[2], rawAddr);
-                std::string mesh = getMeshname(rawAddr);
-                std::cout << std::endl << pickupMeshnameForOutput(mesh) << std::endl;
+                std::string base32 = getBase32(rawAddr);
+                std::cout << std::endl << pickupMeshnameForOutput(base32) << std::endl;
                 return 0;
             } else { error(-501); return -501; }
         } else if (p1 == "--toip" || p1 == "-ti") { // преобразование Meshname -> IP
