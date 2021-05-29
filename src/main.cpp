@@ -306,7 +306,7 @@ int getOnes(const Key value)
     return 0; // никогда не случится
 }
 
-std::string getAddress(const Address rawAddr)
+std::string getAddress(const Address& rawAddr)
 {
     char ipStrBuf[46];
     inet_ntop(AF_INET6, rawAddr.data(), ipStrBuf, 46);
@@ -363,7 +363,7 @@ void miner_thread()
     }
 
     Address rawAddr;
-    std::regex regx(conf.str, std::regex_constants::egrep);
+    std::regex regx(conf.str, std::regex_constants::egrep | std::regex_constants::icase);
     int ones = 0;
 
     for (;;) // основной цикл майнинга

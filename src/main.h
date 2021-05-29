@@ -44,7 +44,7 @@ KeysBox getKeyPair();
 void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr);
 Key bitwiseInverse(const Key key);
 int getOnes(const Key value);
-std::string getAddress(const Address rawAddr);
+std::string getAddress(const Address& rawAddr);
 std::string hexArrayToString(const uint8_t* bytes, int length);
 std::string keyToString(const Key key);
 void process_fortune_key(const KeysBox& block);
