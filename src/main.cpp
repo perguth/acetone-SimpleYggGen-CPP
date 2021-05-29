@@ -462,10 +462,9 @@ void miner_thread()
 
 void startThreads()
 {
-    std::thread* lastThread;
     for (unsigned int i = 0; i < conf.proc; ++i)
     {
-        lastThread = new std::thread(
+        std::thread * thread = new std::thread(
             conf.mode == 0 ? miner_thread<0> :
             conf.mode == 1 ? miner_thread<1> :
             conf.mode == 2 ? miner_thread<2> :
@@ -475,8 +474,9 @@ void startThreads()
             conf.mode == 6 ? miner_thread<6> :
             miner_thread<7>
         );
+        if (i+1 < conf.proc) thread->detach();
+        else thread->join();
     }
-    lastThread->join();
 }
 
 void error(int code)
