@@ -18,7 +18,7 @@ miner * worker = nullptr;
 void make_miner()
 {
     worker = new miner(widgetForMiner);
-    while (worker == nullptr) std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    while (worker == nullptr) std::this_thread::sleep_for(std::chrono::milliseconds(50));
     worker->startThreads();
 }
 

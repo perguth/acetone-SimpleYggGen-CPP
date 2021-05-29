@@ -260,7 +260,7 @@
       <x>70</x>
       <y>70</y>
       <width>411</width>
-      <height>20</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -274,6 +274,22 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>221</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="resources.qrc">:/banner.png</pixmap>
     </property>
    </widget>
   </widget>
@@ -756,6 +772,8 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
