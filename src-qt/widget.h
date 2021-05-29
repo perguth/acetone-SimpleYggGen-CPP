@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include "configure.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -13,13 +14,14 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
+    void setLog(std::string time, uint64_t total, uint64_t found, uint64_t khs);
+    void setAddr(std::string address);
+    option conf;
     ~Widget();
 
 private:
     Ui::Widget *ui;
-
-    unsigned int mode = 1;
-
+    unsigned int m_mode = 1;
     void restoreNotABugLinkButton();
 
 public slots:

@@ -1,5 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
+#include "configure.h"
+#include "miner.h"
 
 #include <iomanip>
 #include <thread>
@@ -8,9 +10,17 @@
 #include <QString>
 #include <QClipboard>
 
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
+Widget* widgetForMiner;
+miner * worker = nullptr;
+
+void make_miner()
+{
+    worker = new miner(widgetForMiner);
+    while (worker == nullptr) std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    worker->startThreads();
+}
+
+Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
     ui->frame_2->setDisabled(true);
@@ -36,8 +46,25 @@ Widget::Widget(QWidget *parent)
     {
         c->setText("https://notabug.org/acetone/SimpleYggGen-CPP");
         ui->notabugLink->setText("Сopied to clipboard");
+        QFont font;
+        font.setItalic(true);
+        font.setPointSize(8);
+        ui->notabugLink->setFont(font);
         std::thread (&Widget::restoreNotABugLinkButton, this).detach(); // TODO async
     });
+}
+
+void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
+{
+    ui->time->setText(tm.c_str());                  // время
+    ui->total->setText(std::to_string(tt).c_str()); // всего
+    ui->found->setText(std::to_string(f).c_str());  // найдено
+    ui->khs->setText(std::to_string(k).c_str());    // скорость
+}
+
+void Widget::setAddr(std::string address)
+{
+    ui->last->setText(address.c_str());
 }
 
 Widget::~Widget()
@@ -48,6 +75,10 @@ Widget::~Widget()
 void Widget::restoreNotABugLinkButton()
 {
     std::this_thread::sleep_for(std::chrono::seconds(3));
+    QFont font;
+    font.setItalic(false);
+    font.setPointSize(8);
+    ui->notabugLink->setFont(font);
     ui->notabugLink->setText("NotABug.org/acetone/SimpleYggGen-CPP");
 }
 
@@ -60,49 +91,49 @@ void Widget::secondByteEdit(int i)
 
 void Widget::ipv6_pat_mode()
 {
-    mode = 0;
+    m_mode = 0;
     string_status(true);
     altitude_status(false);
 }
 
 void Widget::high_mode()
 {
-    mode = 1;
+    m_mode = 1;
     altitude_status(true);
     string_status(false);
 }
 
 void Widget::ipv6_pat_high_mode()
 {
-    mode = 2;
+    m_mode = 2;
     altitude_status(true);
     string_status(true);
 }
 
 void Widget::ipv6_reg_mode()
 {
-    mode = 3;
+    m_mode = 3;
     string_status(true);
     altitude_status(false);
 }
 
 void Widget::ipv6_reg_high_mode()
 {
-    mode = 4;
+    m_mode = 4;
     altitude_status(true);
     string_status(true);
 }
 
 void Widget::mesh_pat_mode()
 {
-    mode = 5;
+    m_mode = 5;
     string_status(true);
     altitude_status(false);
 }
 
 void Widget::mesh_reg_mode()
 {
-    mode = 6;
+    m_mode = 6;
     string_status(true);
     altitude_status(false);
 }
@@ -127,10 +158,29 @@ void Widget::start()
 {
     ui->frame->setDisabled(true);
     ui->frame_2->setDisabled(false);
+
+    conf.mode   = m_mode;
+    conf.proc   = ui->threads->value();
+    conf.high   = ui->height->value();
+    conf.str    = ui->stringSet->text().toStdString();
+    conf.letsup = ui->disableIncrease->isChecked();
+
+    if      (conf.mode == 0) conf.outputfile = "syg-ipv6-pattern.txt";
+    else if (conf.mode == 1) conf.outputfile = "syg-ipv6-high.txt";
+    else if (conf.mode == 2) conf.outputfile = "syg-ipv6-pattern-high.txt";
+    else if (conf.mode == 3) conf.outputfile = "syg-ipv6-regexp.txt";
+    else if (conf.mode == 4) conf.outputfile = "syg-ipv6-regexp-high.txt";
+    else if (conf.mode == 5) conf.outputfile = "syg-meshname-pattern.txt";
+    else if (conf.mode == 6) conf.outputfile = "syg-meshname-regexp.txt";
+    else if (conf.mode == 7) conf.outputfile = "syg-subnet-brute-force.txt";
+
+    widgetForMiner = this;
+    std::thread(make_miner).detach();
 }
 
 void Widget::stop()
 {
+    worker->conf.stop = true;
     ui->frame->setDisabled(false);
     ui->frame_2->setDisabled(true);
 }
