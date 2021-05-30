@@ -6,7 +6,7 @@
 #include <QString>
 #include <QIcon>
 
-const QString PRODUCT_VERSION = "5.0-irontree";
+const QString PRODUCT_VERSION = "5.0+ prerelease";
 
 int main(int argc, char *argv[])
 {
