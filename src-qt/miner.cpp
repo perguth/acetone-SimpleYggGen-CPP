@@ -58,7 +58,7 @@ void miner::logStatistics()
 
         std::chrono::duration<double, std::milli> df = blocks_duration;
         blocks_duration = std::chrono::steady_clock::duration::zero();
-        uint64_t khs = conf.proc * countsize / df.count();
+        double khs = conf.proc * countsize / df.count();
 
         std::stringstream ss;
         ss << std::setw(2) << std::setfill('0') << timedays << ":" << std::setw(2) << std::setfill('0')

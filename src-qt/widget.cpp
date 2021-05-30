@@ -58,15 +58,17 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     });
 }
 
-void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
+void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, double k)
 {
+    if (k > speedRecord) { // максимальная скорость
+        speedRecord = k;
+        std::string hs = "Maximum: " + std::to_string(static_cast<long>(speedRecord*1000)) + " per second";
+        ui->hs->setText(hs.c_str());
+    }
     ui->time->setText(tm.c_str());                  // время
     ui->total->setText(std::to_string(tt).c_str()); // общий счетчик
     ui->found->setText(std::to_string(f).c_str());  // общий счетчик
     ui->khs->setText(std::to_string(k).c_str());    // скорость
-
-    std::string hs = std::to_string(k*1000) + " per second";
-    ui->hs->setText(hs.c_str());
 }
 
 void Widget::setAddr(std::string address)
@@ -180,6 +182,7 @@ void Widget::start()
 
     ui->path->setText(QDir::currentPath());
     ui->label->setToolTip("acetone@i2pmail.org");
+    speedRecord = 0;
     widgetForMiner = this;
     std::thread(make_miner).detach();
 }

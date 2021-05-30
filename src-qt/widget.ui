@@ -90,7 +90,7 @@
      <rect>
       <x>70</x>
       <y>10</y>
-      <width>71</width>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -132,7 +132,7 @@
      <rect>
       <x>70</x>
       <y>30</y>
-      <width>71</width>
+      <width>81</width>
       <height>16</height>
      </rect>
     </property>
@@ -178,7 +178,7 @@
       <x>170</x>
       <y>30</y>
       <width>311</width>
-      <height>20</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -219,7 +219,7 @@
       <x>170</x>
       <y>10</y>
       <width>311</width>
-      <height>20</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -229,7 +229,7 @@
      </font>
     </property>
     <property name="text">
-     <string>0 per second</string>
+     <string>Maximum: 0 per second</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -429,7 +429,7 @@
       <x>10</x>
       <y>70</y>
       <width>201</width>
-      <height>19</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -467,7 +467,7 @@
       <x>10</x>
       <y>50</y>
       <width>201</width>
-      <height>19</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -485,7 +485,7 @@
      <rect>
       <x>230</x>
       <y>40</y>
-      <width>141</width>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
@@ -499,7 +499,7 @@
      <enum>Qt::LeftToRight</enum>
     </property>
     <property name="text">
-     <string>Start altitude:</string>
+     <string>Start height:</string>
     </property>
     <property name="textFormat">
      <enum>Qt::PlainText</enum>
@@ -508,9 +508,9 @@
    <widget class="QLabel" name="x_doubledot">
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>390</x>
       <y>40</y>
-      <width>20</width>
+      <width>31</width>
       <height>21</height>
      </rect>
     </property>
@@ -521,13 +521,13 @@
      </font>
     </property>
     <property name="text">
-     <string>:)</string>
+     <string>:*]</string>
     </property>
    </widget>
    <widget class="QLabel" name="secondByte">
     <property name="geometry">
      <rect>
-      <x>380</x>
+      <x>370</x>
       <y>40</y>
       <width>21</width>
       <height>21</height>
@@ -573,7 +573,7 @@
    <widget class="QLabel" name="x_firstByte">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>350</x>
       <y>40</y>
       <width>16</width>
       <height>21</height>
@@ -586,7 +586,7 @@
      </font>
     </property>
     <property name="text">
-     <string>(2</string>
+     <string>[2</string>
     </property>
    </widget>
    <widget class="Line" name="pipe">
@@ -657,9 +657,9 @@
    <widget class="QLabel" name="x_threads">
     <property name="geometry">
      <rect>
-      <x>300</x>
+      <x>290</x>
       <y>10</y>
-      <width>121</width>
+      <width>131</width>
       <height>21</height>
      </rect>
     </property>

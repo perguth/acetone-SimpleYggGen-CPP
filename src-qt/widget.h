@@ -14,7 +14,7 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
-    void setLog(std::string time, uint64_t total, uint64_t found, uint64_t khs);
+    void setLog(std::string tm, uint64_t tt, uint64_t f, double k);
     void setAddr(std::string address);
     option conf;
     ~Widget();
@@ -22,6 +22,7 @@ public:
 private:
     Ui::Widget *ui;
     unsigned int m_mode = 1;
+    double speedRecord = 0;
     void restoreNotABugLinkButton();
 
 public slots:
