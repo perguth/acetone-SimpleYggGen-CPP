@@ -17,15 +17,9 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
 
     testOutput();
 
-    if (conf.mode == 3 || conf.mode == 4 || conf.mode == 6) // регулярки
-    {
-        if (conf.str.front() != '"' || conf.str.back() != '"')
-            conf.str = '"' + conf.str + '"';
-
-        if (conf.mode == 6) { // поиск по сырому base32, где конец - это паддинг "====".
-            for (auto it = conf.str.begin(); it != conf.str.end(); ++it)
-                if (*it == '$') *it = '=';
-        }
+    if (conf.mode == 6) { // поиск по сырому base32, где конец - это паддинг "====".
+        for (auto it = conf.str.begin(); it != conf.str.end(); ++it)
+            if (*it == '$') *it = '=';
     }
 
     if (conf.mode == 5) // meshname pattern
