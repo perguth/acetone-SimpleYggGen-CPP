@@ -28,7 +28,6 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
     }
 
     window->setLog("00:00:00:00", 0, 0, 0);
-    window->setAddr("<last address will be here>");
 }
 
 void miner::testOutput()
