@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>510</width>
-    <height>376</height>
+    <width>509</width>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,7 +91,7 @@
       <x>70</x>
       <y>10</y>
       <width>81</width>
-      <height>20</height>
+      <height>16</height>
      </rect>
     </property>
     <property name="font">
@@ -229,7 +229,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Maximum: 0 per second</string>
+     <string>Maximum speed: 0 kH/s</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -302,6 +302,71 @@
     </property>
    </widget>
   </widget>
+  <widget class="QLabel" name="x_checknewver_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>170</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>PT Mono</family>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>GPLv3 (c) 2021</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="notabugLink">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>170</y>
+     <width>261</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>PT Mono</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="text">
+    <string>NotABug.org/acetone/SimpleYggGen-CPP</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="autoRepeat">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>false</bool>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
+   <property name="default">
+    <bool>false</bool>
+   </property>
+   <property name="flat">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QFrame" name="frame">
    <property name="enabled">
     <bool>true</bool>
@@ -310,8 +375,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>491</width>
-     <height>161</height>
+     <width>487</width>
+     <height>157</height>
     </rect>
    </property>
    <property name="font">
@@ -717,71 +782,6 @@
      <string>Disable auto-increase</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QLabel" name="x_checknewver_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>170</y>
-     <width>101</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>PT Mono</family>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string>GPLv3 (c) 2021</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="notabugLink">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>170</y>
-     <width>261</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>PT Mono</family>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="text">
-    <string>NotABug.org/acetone/SimpleYggGen-CPP</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="autoRepeat">
-    <bool>true</bool>
-   </property>
-   <property name="autoExclusive">
-    <bool>false</bool>
-   </property>
-   <property name="autoDefault">
-    <bool>false</bool>
-   </property>
-   <property name="default">
-    <bool>false</bool>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
   </widget>
  </widget>
  <resources>

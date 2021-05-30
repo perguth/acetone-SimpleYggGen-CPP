@@ -5,7 +5,7 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
 {
     conf = window->conf;
     conf.stop = false;
-    countsize = 20000 * conf.proc; // Периодичность обновления счетчиков
+    countsize = 30000 * conf.proc; // Периодичность обновления счетчиков
 
     conf.mode == 0 ? conf.outputfile = "syg-ipv6-pattern.txt" :
     conf.mode == 1 ? conf.outputfile = "syg-ipv6-high.txt" :
@@ -58,7 +58,7 @@ void miner::logStatistics()
 
         std::chrono::duration<double, std::milli> df = blocks_duration;
         blocks_duration = std::chrono::steady_clock::duration::zero();
-        double khs = conf.proc * countsize / df.count();
+        uint64_t khs = conf.proc * countsize / df.count();
 
         std::stringstream ss;
         ss << std::setw(2) << std::setfill('0') << timedays << ":" << std::setw(2) << std::setfill('0')

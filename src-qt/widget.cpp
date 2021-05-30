@@ -58,11 +58,11 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     });
 }
 
-void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, double k)
+void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
 {
     if (k > speedRecord) { // максимальная скорость
         speedRecord = k;
-        std::string hs = "Maximum: " + std::to_string(static_cast<long>(speedRecord*1000)) + " per second";
+        std::string hs = "Maximum speed: " + std::to_string(speedRecord) + " kH/s";
         ui->hs->setText(hs.c_str());
     }
     ui->time->setText(tm.c_str());                  // время
