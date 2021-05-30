@@ -182,7 +182,6 @@ void Widget::start()
 
     ui->path->setText(QDir::currentPath());
     ui->label->setToolTip("acetone@i2pmail.org");
-    speedRecord = 0;
     widgetForMiner = this;
     std::thread(make_miner).detach();
 }
