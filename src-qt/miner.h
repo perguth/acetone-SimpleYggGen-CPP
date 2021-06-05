@@ -6,7 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <thread>
-#include <mutex>
+#include <QMutex>
 #include <chrono>
 #include <regex>
 #include <sodium.h>
@@ -70,7 +70,7 @@ private:
     quint64 countfortune = 0;                   // счетчик нахождений
     std::chrono::steady_clock::duration blocks_duration;
 
-    std::mutex mtx;
+    QMutex mtx;
 };
 
 #endif // MINER_H
