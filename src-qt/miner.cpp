@@ -65,19 +65,17 @@ void miner::logStatistics()
         ss << std::setw(2) << std::setfill('0') << timedays << ":" << std::setw(2) << std::setfill('0')
            << timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds;
 
-        mtx.lock();
         emit setLog(ss.str().c_str(), totalcount, countfortune, khs);
-        mtx.unlock();
     }
 }
 
 void miner::logKeys(Address raw, const KeysBox keys)
 {
-    mtx.lock();
-
     std::string base32 = getBase32(raw);
     if (conf.mode == 5 || conf.mode == 6) emit setAddr(pickupMeshnameForOutput(base32).c_str());
     else                                  emit setAddr(getAddress(raw).c_str());
+
+    mtx.lock();
 
     std::ofstream output(conf.outputfile, std::ios::app);
     output << std::endl;
