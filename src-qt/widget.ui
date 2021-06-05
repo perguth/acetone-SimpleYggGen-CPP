@@ -321,52 +321,6 @@
     <string>GPLv3 (c) 2021</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="notabugLink">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>170</y>
-     <width>261</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>PT Mono</family>
-     <pointsize>8</pointsize>
-    </font>
-   </property>
-   <property name="cursor">
-    <cursorShape>PointingHandCursor</cursorShape>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="text">
-    <string>NotABug.org/acetone/SimpleYggGen-CPP</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="autoRepeat">
-    <bool>true</bool>
-   </property>
-   <property name="autoExclusive">
-    <bool>false</bool>
-   </property>
-   <property name="autoDefault">
-    <bool>false</bool>
-   </property>
-   <property name="default">
-    <bool>false</bool>
-   </property>
-   <property name="flat">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QFrame" name="frame">
    <property name="enabled">
     <bool>true</bool>
@@ -782,6 +736,31 @@
      <string>Disable auto-increase</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QLabel" name="notabugLink">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>170</y>
+     <width>261</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>PT Mono</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>&lt;a href=&quot;https://notabug.org/acetone/SimpleYggGen-CPP&quot;&gt;NotABug.org/acetone/SimpleYggGen-CPP&lt;/a&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="openExternalLinks">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources>
