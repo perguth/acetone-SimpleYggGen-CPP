@@ -32,12 +32,18 @@ struct KeysBox
     Key PrivateKey;
 };
 
-class miner
+class miner : public QObject
 {
+    Q_OBJECT
+
 public:
-    miner(Widget*);
+    miner(Widget* w = 0);
     void startThreads();
     option conf;
+
+signals:
+    void setLog(QString, quint64, quint64, quint64);
+    void setAddr(QString);
 
 private:
     Widget *window;
@@ -60,8 +66,8 @@ private:
 
     std::time_t sygstartedin = std::time(NULL); // для вывода времени работы
     int countsize = 0;                          // определяет периодичность вывода счетчика
-    uint64_t totalcount = 0;                    // общий счетчик
-    uint64_t countfortune = 0;                  // счетчик нахождений
+    quint64 totalcount = 0;                     // общий счетчик
+    quint64 countfortune = 0;                   // счетчик нахождений
     std::chrono::steady_clock::duration blocks_duration;
 
     std::mutex mtx;

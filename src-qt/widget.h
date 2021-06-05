@@ -14,8 +14,6 @@ class Widget : public QWidget
 
 public:
     Widget(QWidget *parent = nullptr);
-    void setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k);
-    void setAddr(std::string address);
     option conf;
     ~Widget();
 
@@ -41,5 +39,8 @@ public slots:
     void start();
     void stop();
     void changeBanner();
+
+    void setAddr(QString address);
+    void setLog(QString, quint64, quint64, quint64);
 };
 #endif // WIDGET_H

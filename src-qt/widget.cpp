@@ -45,22 +45,22 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->stop, SIGNAL(clicked()), this, SLOT(stop()));
 }
 
-void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
+void Widget::setLog(QString tm, quint64 tt, quint64 f, quint64 k)
 {
     if (k > speedRecord) { // максимальная скорость
         speedRecord = k;
         std::string hs = "Maximum speed: " + std::to_string(speedRecord) + " kH/s";
         ui->hs->setText(hs.c_str());
     }
-    ui->time->setText(tm.c_str());                  // время
+    ui->time->setText(tm);                          // время
     ui->total->setText(std::to_string(tt).c_str()); // общий счетчик
     ui->found->setText(std::to_string(f).c_str());  // общий счетчик
     ui->khs->setText(std::to_string(k).c_str());    // скорость
 }
 
-void Widget::setAddr(std::string address)
+void Widget::setAddr(QString address)
 {
-    ui->last->setText(address.c_str());
+    ui->last->setText(address);
 }
 
 Widget::~Widget()
@@ -150,12 +150,14 @@ void Widget::start()
     ui->frame->hide();
     ui->frame_2->show();
     ui->frame_2->setGeometry(10, 10, 491, 161);
+    setLog("00:00:00:00", 0, 0, 0);
 
     conf.mode   = m_mode;
     conf.proc   = ui->threads->value();
     conf.high   = ui->height->value();
     conf.str    = ui->stringSet->text().toStdString();
     conf.letsup = !ui->disableIncrease->isChecked();
+    conf.stop   = false;
 
     ui->path->setText(QDir::currentPath());
     ui->label->setToolTip("acetone@i2pmail.org");

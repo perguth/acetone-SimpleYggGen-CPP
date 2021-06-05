@@ -1,16 +1,15 @@
 #include "miner.h"
 #include <iostream>
 
-miner::miner(Widget *parent): window(parent), blocks_duration(0)
+miner::miner(Widget *w): window(w), blocks_duration(0)
 {
     conf = window->conf;
-    conf.stop = false;
     countsize = 30000 * conf.proc; // Периодичность обновления счетчиков
 
     conf.mode == 0 ? conf.outputfile = "syg-ipv6-pattern.txt" :
     conf.mode == 1 ? conf.outputfile = "syg-ipv6-high.txt" :
     conf.mode == 2 ? conf.outputfile = "syg-ipv6-pattern-high.txt" :
-    conf.mode == 3 ? conf.outputfile = "syg-ipv6-regexp.txt":
+    conf.mode == 3 ? conf.outputfile = "syg-ipv6-regexp.txt" :
     conf.mode == 4 ? conf.outputfile = "syg-ipv6-regexp-high.txt" :
     conf.mode == 5 ? conf.outputfile = "syg-meshname-pattern.txt" :
         /* 6 */      conf.outputfile = "syg-meshname-regexp.txt" ;
@@ -27,7 +26,10 @@ miner::miner(Widget *parent): window(parent), blocks_duration(0)
         conf.str = pickupStringForMeshname(conf.str);
     }
 
-    window->setLog("00:00:00:00", 0, 0, 0);
+    QObject::connect(this, SIGNAL(setLog(QString, quint64, quint64, quint64)),
+                     window, SLOT(setLog(QString, quint64, quint64, quint64)));
+    QObject::connect(this, SIGNAL(setAddr(QString)),
+                     window, SLOT(setAddr(QString)));
 }
 
 void miner::testOutput()
@@ -57,14 +59,14 @@ void miner::logStatistics()
 
         std::chrono::duration<double, std::milli> df = blocks_duration;
         blocks_duration = std::chrono::steady_clock::duration::zero();
-        uint64_t khs = conf.proc * countsize / df.count();
+        quint64 khs = conf.proc * countsize / df.count();
 
         std::stringstream ss;
         ss << std::setw(2) << std::setfill('0') << timedays << ":" << std::setw(2) << std::setfill('0')
            << timehours << ":" << std::setw(2) << timeminutes << ":" << std::setw(2) << timeseconds;
 
         mtx.lock();
-        window->setLog(ss.str(), totalcount, countfortune, khs);
+        emit setLog(ss.str().c_str(), totalcount, countfortune, khs);
         mtx.unlock();
     }
 }
@@ -74,8 +76,8 @@ void miner::logKeys(Address raw, const KeysBox keys)
     mtx.lock();
 
     std::string base32 = getBase32(raw);
-    if (conf.mode == 5 || conf.mode == 6) window->setAddr(pickupMeshnameForOutput(base32));
-    else                                  window->setAddr(getAddress(raw));
+    if (conf.mode == 5 || conf.mode == 6) emit setAddr(pickupMeshnameForOutput(base32).c_str());
+    else                                  emit setAddr(getAddress(raw).c_str());
 
     std::ofstream output(conf.outputfile, std::ios::app);
     output << std::endl;
