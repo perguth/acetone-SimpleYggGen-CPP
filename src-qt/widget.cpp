@@ -11,7 +11,6 @@
 #include <future>
 #include <iostream>
 #include <QString>
-#include <QClipboard>
 
 Widget* widgetForMiner;
 miner * worker = nullptr;
@@ -44,18 +43,6 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->mesh_reg_mode, SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
 
     QObject::connect(ui->stop, SIGNAL(clicked()), this, SLOT(stop()));
-
-    QClipboard* c = QApplication::clipboard();
-    QObject::connect(ui->notabugLink, &QPushButton::clicked, c, [&]()
-    {
-        c->setText("https://notabug.org/acetone/SimpleYggGen-CPP");
-        ui->notabugLink->setText("Сopied to clipboard");
-        QFont font;
-        font.setItalic(true);
-        font.setPointSize(8);
-        ui->notabugLink->setFont(font);
-        std::thread (&Widget::restoreNotABugLinkButton, this).detach(); // TODO async
-    });
 }
 
 void Widget::setLog(std::string tm, uint64_t tt, uint64_t f, uint64_t k)
@@ -79,16 +66,6 @@ void Widget::setAddr(std::string address)
 Widget::~Widget()
 {
     delete ui;
-}
-
-void Widget::restoreNotABugLinkButton()
-{
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    QFont font;
-    font.setItalic(false);
-    font.setPointSize(8);
-    ui->notabugLink->setFont(font);
-    ui->notabugLink->setText("NotABug.org/acetone/SimpleYggGen-CPP");
 }
 
 void Widget::secondByteEdit(int i)
