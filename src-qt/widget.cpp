@@ -150,7 +150,10 @@ void Widget::start()
     ui->frame->hide();
     ui->frame_2->show();
     ui->frame_2->setGeometry(10, 10, 491, 161);
+    ui->last->setText("<last address will be here>");
+    ui->hs->setText("Maximum speed: 0 kH/s");
     setLog("00:00:00:00", 0, 0, 0);
+    speedRecord = 0;
 
     conf.mode   = m_mode;
     conf.proc   = ui->threads->value();
