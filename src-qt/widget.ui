@@ -580,7 +580,7 @@
      </font>
     </property>
     <property name="minimum">
-     <number>9</number>
+     <number>4</number>
     </property>
     <property name="maximum">
      <number>136</number>
