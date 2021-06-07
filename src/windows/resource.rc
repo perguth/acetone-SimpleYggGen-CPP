@@ -8,8 +8,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 MAINICON ICON "syg-icon.ico"
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION 5,0,0
-PRODUCTVERSION 5,0,0
+FILEVERSION 5,1,0
+PRODUCTVERSION 5,1,0
 
 FILEOS 0x40004L
 FILETYPE 0x1L
@@ -22,11 +22,11 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "acetone"
             VALUE "FileDescription", "Simple Yggdrasil address miner"
-            VALUE "FileVersion", "5.0.0"
+            VALUE "FileVersion", "5.1.0"
             VALUE "LegalCopyright", "(c) GPLv3"
             VALUE "OriginalFilename", "sygcpp"
             VALUE "ProductName", "SimpleYggGen"
-            VALUE "ProductVersion", "5.0.0-irontree"
+            VALUE "ProductVersion", "5.1.0-flow"
         END
     END
     BLOCK "VarFileInfo"
