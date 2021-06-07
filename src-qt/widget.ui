@@ -467,7 +467,7 @@
           </font>
          </property>
          <property name="text">
-          <string>kH/s: </string>
+          <string>kH/s:  </string>
          </property>
         </widget>
        </item>
@@ -528,7 +528,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Found:</string>
+          <string>Found: </string>
          </property>
         </widget>
        </item>
@@ -589,7 +589,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Total:</string>
+          <string>Total: </string>
          </property>
         </widget>
        </item>
@@ -652,7 +652,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Path: </string>
+          <string>Path:  </string>
          </property>
         </widget>
        </item>
