@@ -15,7 +15,6 @@
 
 Widget * widgetForMiner = nullptr;
 miner * worker = nullptr;
-QKeySequence toAction(Qt::Key_Return, Qt::Key_Enter);
 
 void make_miner()
 {
