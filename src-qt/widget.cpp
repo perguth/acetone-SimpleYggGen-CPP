@@ -150,6 +150,7 @@ void Widget::action()
         ui->khs->setNum(0);
         ui->stackedWidget->setCurrentIndex(0);
         ui->action->setText("START");
+        ui->action->setShortcut(Qt::Key_Return);
         return;
     }
 
@@ -174,6 +175,7 @@ void Widget::action()
     widgetForMiner = this;
     isStarted = true;
     ui->action->setText("STOP");
+    ui->action->setShortcut(Qt::Key_Return);
     std::thread(make_miner).detach();
 }
 
