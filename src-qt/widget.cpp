@@ -30,9 +30,6 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     ui->threads->setMaximum(processor_count);
     ui->threads->setValue(processor_count);
 
-    ui->path->setText(QDir::currentPath());
-    ui->label->setToolTip("acetone@i2pmail.org");
-
     QObject::connect(ui->height, SIGNAL(valueChanged(int)), this, SLOT(secondByteEdit(int)));
     QObject::connect(ui->action, SIGNAL(clicked()), this, SLOT(action()));
 
@@ -44,6 +41,8 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->mesh_pat_mode, SIGNAL(clicked()), this, SLOT(mesh_pat_mode()));
     QObject::connect(ui->mesh_reg_mode, SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
 
+    ui->label->setToolTip("acetone@i2pmail.org");
+    ui->path->setText(QDir::currentPath());
     this->setFixedSize(this->size());
 }
 
@@ -146,6 +145,7 @@ void Widget::action()
     if (isStarted) {
         worker->conf.stop = true;
         isStarted = false;
+        ui->stackedWidget->setCurrentIndex(0);
         ui->action->setText("Start");
         return;
     }
@@ -155,6 +155,7 @@ void Widget::action()
         return;
     }
 
+    ui->stackedWidget->setCurrentIndex(1);
     ui->last->setText("<last address will be here>");
     ui->hs->setText("Maximum speed: 0 kH/s");
     setLog("00:00:00:00", 0, 0, 0);
