@@ -57,7 +57,7 @@ void Widget::setLog(QString tm, quint64 tt, quint64 f, quint64 k)
     }
     ui->time->setText(tm);                          // время
     ui->total->setText(std::to_string(tt).c_str()); // общий счетчик
-    ui->found->setText(std::to_string(f).c_str());  // общий счетчик
+    ui->found->setText(std::to_string(f).c_str());  // колесо фартуны
     ui->khs->setText(std::to_string(k).c_str());    // скорость
 }
 
