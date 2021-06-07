@@ -19,7 +19,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QRadioButton" name="ipv6_reg_mode">
+        <widget class="QRadioButton" name="high_mode">
          <property name="font">
           <font>
            <family>PT Mono</family>
@@ -27,46 +27,10 @@
           </font>
          </property>
          <property name="text">
-          <string>IPv6 regexp</string>
+          <string>High</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="mesh_reg_mode">
-         <property name="font">
-          <font>
-           <family>PT Mono</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Meshname regexp</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="ipv6_reg_high_mode">
-         <property name="font">
-          <font>
-           <family>PT Mono</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>IPv6 regexp + height</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="ipv6_pat_high_mode">
-         <property name="font">
-          <font>
-           <family>PT Mono</family>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>IPv6 pattern + height</string>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -84,6 +48,45 @@
         </widget>
        </item>
        <item>
+        <widget class="QRadioButton" name="ipv6_pat_high_mode">
+         <property name="font">
+          <font>
+           <family>PT Mono</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>IPv6 pattern + height</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="ipv6_reg_mode">
+         <property name="font">
+          <font>
+           <family>PT Mono</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>IPv6 regexp</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="ipv6_reg_high_mode">
+         <property name="font">
+          <font>
+           <family>PT Mono</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>IPv6 regexp + height</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QRadioButton" name="mesh_pat_mode">
          <property name="font">
           <font>
@@ -97,7 +100,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="high_mode">
+        <widget class="QRadioButton" name="mesh_reg_mode">
          <property name="font">
           <font>
            <family>PT Mono</family>
@@ -105,10 +108,7 @@
           </font>
          </property>
          <property name="text">
-          <string>High</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
+          <string>Meshname regexp</string>
          </property>
         </widget>
        </item>
