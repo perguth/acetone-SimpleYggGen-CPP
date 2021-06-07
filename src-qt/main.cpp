@@ -6,7 +6,7 @@
 #include <QString>
 #include <QIcon>
 
-const QString PRODUCT_VERSION = "5.0+ prerelease";
+const QString PRODUCT_VERSION = "5.1 flow";
 
 int main(int argc, char *argv[])
 {

@@ -21,7 +21,7 @@ void intro()
 {
     std::cout << std::endl << "\
  +--------------------------------------------------------------------------+ \n\
- |                   [ SimpleYggGen C++    5.0-irontree ]                   | \n\
+ |                   [    SimpleYggGen C++  5.1-flow    ]                   | \n\
  |                   EdDSA public key -> IPv6 -> Meshname                   | \n\
  |                   notabug.org/acetone/SimpleYggGen-CPP                   | \n\
  |                                                                          | \n\
