@@ -35,13 +35,13 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->height, SIGNAL(valueChanged(int)), this, SLOT(secondByteEdit(int)));
     QObject::connect(ui->action, SIGNAL(clicked()), this, SLOT(action()));
 
-    QObject::connect(ui->ipv6_pat_mode, SIGNAL(clicked()), this, SLOT(ipv6_pat_mode()));
-    QObject::connect(ui->high_mode, SIGNAL(clicked()), this, SLOT(high_mode()));
+    QObject::connect(ui->ipv6_pat_mode,      SIGNAL(clicked()), this, SLOT(ipv6_pat_mode()));
+    QObject::connect(ui->high_mode,          SIGNAL(clicked()), this, SLOT(high_mode()));
     QObject::connect(ui->ipv6_pat_high_mode, SIGNAL(clicked()), this, SLOT(ipv6_pat_high_mode()));
-    QObject::connect(ui->ipv6_reg_mode, SIGNAL(clicked()), this, SLOT(ipv6_reg_mode()));
+    QObject::connect(ui->ipv6_reg_mode,      SIGNAL(clicked()), this, SLOT(ipv6_reg_mode()));
     QObject::connect(ui->ipv6_reg_high_mode, SIGNAL(clicked()), this, SLOT(ipv6_reg_high_mode()));
-    QObject::connect(ui->mesh_pat_mode, SIGNAL(clicked()), this, SLOT(mesh_pat_mode()));
-    QObject::connect(ui->mesh_reg_mode, SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
+    QObject::connect(ui->mesh_pat_mode,      SIGNAL(clicked()), this, SLOT(mesh_pat_mode()));
+    QObject::connect(ui->mesh_reg_mode,      SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
 
     ui->label->setToolTip("acetone@i2pmail.org");
     ui->path->setText(QDir::currentPath());
@@ -154,7 +154,7 @@ void Widget::action()
     }
 
     if (ui->stringSet->text() == "" && m_mode != 1) {
-        ui->stringSet->setPlaceholderText("Hey bro ???");
+        ui->stringSet->setPlaceholderText("PATTERN/REGEXP");
         return;
     }
 
