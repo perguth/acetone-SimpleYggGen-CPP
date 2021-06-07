@@ -11,9 +11,11 @@
 #include <future>
 #include <iostream>
 #include <QString>
+#include <QAction>
 
 Widget * widgetForMiner = nullptr;
 miner * worker = nullptr;
+QKeySequence toAction(Qt::Key_Return, Qt::Key_Enter);
 
 void make_miner()
 {
@@ -30,7 +32,10 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     ui->threads->setMaximum(processor_count);
     ui->threads->setValue(processor_count);
 
-    ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
+    auto actionShotcuts = new QAction(this);
+    actionShotcuts->setShortcuts({ Qt::Key_Return, Qt::Key_Enter });
+    this->addAction(actionShotcuts);
+    connect(actionShotcuts, &QAction::triggered, [&](){ ui->action->animateClick(); });
 
     QObject::connect(ui->height, SIGNAL(valueChanged(int)), this, SLOT(secondByteEdit(int)));
     QObject::connect(ui->action, SIGNAL(clicked()), this, SLOT(action()));
@@ -150,7 +155,6 @@ void Widget::action()
         ui->khs->setNum(0);
         ui->stackedWidget->setCurrentIndex(0);
         ui->action->setText("START");
-        ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
         return;
     }
 
@@ -175,7 +179,6 @@ void Widget::action()
     widgetForMiner = this;
     isStarted = true;
     ui->action->setText("STOP");
-    ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
     std::thread(make_miner).detach();
 }
 
