@@ -30,7 +30,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     ui->threads->setMaximum(processor_count);
     ui->threads->setValue(processor_count);
 
-    ui->action->setShortcut(Qt::Key_Return);
+    ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
 
     QObject::connect(ui->height, SIGNAL(valueChanged(int)), this, SLOT(secondByteEdit(int)));
     QObject::connect(ui->action, SIGNAL(clicked()), this, SLOT(action()));
@@ -150,7 +150,7 @@ void Widget::action()
         ui->khs->setNum(0);
         ui->stackedWidget->setCurrentIndex(0);
         ui->action->setText("START");
-        ui->action->setShortcut(Qt::Key_Return);
+        ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
         return;
     }
 
@@ -175,7 +175,7 @@ void Widget::action()
     widgetForMiner = this;
     isStarted = true;
     ui->action->setText("STOP");
-    ui->action->setShortcut(Qt::Key_Return);
+    ui->action->setShortcut(Qt::Key_Return | Qt::Key_Enter);
     std::thread(make_miner).detach();
 }
 
