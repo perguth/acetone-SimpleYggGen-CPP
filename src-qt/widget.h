@@ -21,7 +21,7 @@ private:
     Ui::Widget *ui;
     unsigned int m_mode = 1;
     uint64_t speedRecord = 0;
-    void restoreNotABugLinkButton();
+    bool isStarted = false;
 
 public slots:
     void secondByteEdit(int);
@@ -36,8 +36,7 @@ public slots:
     void altitude_status(bool);
     void string_status(bool);
 
-    void start();
-    void stop();
+    void action();
     void changeBanner();
 
     void setAddr(QString address);

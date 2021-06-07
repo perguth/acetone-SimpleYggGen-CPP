@@ -25,14 +25,16 @@ void make_miner()
 Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    ui->frame_2->hide();
 
     unsigned int processor_count = std::thread::hardware_concurrency();
     ui->threads->setMaximum(processor_count);
     ui->threads->setValue(processor_count);
 
+    ui->path->setText(QDir::currentPath());
+    ui->label->setToolTip("acetone@i2pmail.org");
+
     QObject::connect(ui->height, SIGNAL(valueChanged(int)), this, SLOT(secondByteEdit(int)));
-    QObject::connect(ui->startMining, SIGNAL(clicked()), this, SLOT(start()));
+    QObject::connect(ui->action, SIGNAL(clicked()), this, SLOT(action()));
 
     QObject::connect(ui->ipv6_pat_mode, SIGNAL(clicked()), this, SLOT(ipv6_pat_mode()));
     QObject::connect(ui->high_mode, SIGNAL(clicked()), this, SLOT(high_mode()));
@@ -42,7 +44,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     QObject::connect(ui->mesh_pat_mode, SIGNAL(clicked()), this, SLOT(mesh_pat_mode()));
     QObject::connect(ui->mesh_reg_mode, SIGNAL(clicked()), this, SLOT(mesh_reg_mode()));
 
-    QObject::connect(ui->stop, SIGNAL(clicked()), this, SLOT(stop()));
+    this->setFixedSize(this->size());
 }
 
 void Widget::setLog(QString tm, quint64 tt, quint64 f, quint64 k)
@@ -137,19 +139,22 @@ void Widget::altitude_status(bool b)
 void Widget::string_status(bool b)
 {
     ui->stringSet->setEnabled(b);
-    ui->x_string->setEnabled(b);
 }
 
-void Widget::start()
+void Widget::action()
 {
-    if (ui->stringSet->text() == "" && m_mode != 1) {
-        ui->stringSet->setPlaceholderText("???");
+    if (isStarted) {
+        worker->conf.stop = true;
+        isStarted = false;
+        ui->action->setText("Start");
         return;
     }
 
-    ui->frame->hide();
-    ui->frame_2->show();
-    ui->frame_2->setGeometry(10, 10, 491, 161);
+    if (ui->stringSet->text() == "" && m_mode != 1) {
+        ui->stringSet->setPlaceholderText("WHAT ARE YOU DOING BRO?");
+        return;
+    }
+
     ui->last->setText("<last address will be here>");
     ui->hs->setText("Maximum speed: 0 kH/s");
     setLog("00:00:00:00", 0, 0, 0);
@@ -162,17 +167,10 @@ void Widget::start()
     conf.letsup = !ui->disableIncrease->isChecked();
     conf.stop   = false;
 
-    ui->path->setText(QDir::currentPath());
-    ui->label->setToolTip("acetone@i2pmail.org");
     widgetForMiner = this;
+    isStarted = true;
+    ui->action->setText("Stop");
     std::thread(make_miner).detach();
-}
-
-void Widget::stop()
-{
-    worker->conf.stop = true;
-    ui->frame->show();
-    ui->frame_2->hide();
 }
 
 void Widget::changeBanner()
