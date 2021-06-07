@@ -147,6 +147,7 @@ void Widget::action()
     if (isStarted) {
         worker->conf.stop = true;
         isStarted = false;
+        ui->khs->setNum(0);
         ui->stackedWidget->setCurrentIndex(0);
         ui->action->setText("START");
         return;
