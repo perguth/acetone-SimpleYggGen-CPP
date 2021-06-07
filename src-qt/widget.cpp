@@ -12,7 +12,7 @@
 #include <iostream>
 #include <QString>
 
-Widget* widgetForMiner;
+Widget * widgetForMiner = nullptr;
 miner * worker = nullptr;
 
 void make_miner()
