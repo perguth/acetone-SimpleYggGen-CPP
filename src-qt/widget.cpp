@@ -146,12 +146,12 @@ void Widget::action()
         worker->conf.stop = true;
         isStarted = false;
         ui->stackedWidget->setCurrentIndex(0);
-        ui->action->setText("Start");
+        ui->action->setText("START");
         return;
     }
 
     if (ui->stringSet->text() == "" && m_mode != 1) {
-        ui->stringSet->setPlaceholderText("WHAT ARE YOU DOING BRO?");
+        ui->stringSet->setPlaceholderText("Hey bro ???");
         return;
     }
 
@@ -170,7 +170,7 @@ void Widget::action()
 
     widgetForMiner = this;
     isStarted = true;
-    ui->action->setText("Stop");
+    ui->action->setText("STOP");
     std::thread(make_miner).detach();
 }
 
