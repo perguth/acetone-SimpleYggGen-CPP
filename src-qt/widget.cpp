@@ -169,6 +169,11 @@ void Widget::action()
 
     if (ui->stringSet->text() == "" && m_mode != 1) {
         ui->stringSet->setPlaceholderText("PATTERN/REGEXP");
+        ui->stringSet->setStyleSheet("background-color: gray");
+        std::thread ([&](){
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            ui->stringSet->setStyleSheet("");
+        }).detach();
         return;
     }
 
