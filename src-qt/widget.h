@@ -22,6 +22,7 @@ private:
     unsigned int m_mode = 1;
     uint64_t speedRecord = 0;
     bool isStarted = false;
+    QString numToReadbleString(const quint64);
 
 public slots:
     void secondByteEdit(int);
@@ -39,7 +40,7 @@ public slots:
     void action();
     void changeBanner();
 
-    void setAddr(QString address);
-    void setLog(QString, quint64, quint64, quint64);
+    void setAddr(const QString address);
+    void setLog(const QString, const quint64, const quint64, const quint64);
 };
 #endif // WIDGET_H

@@ -52,20 +52,20 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget)
     this->setFixedSize(this->size());
 }
 
-void Widget::setLog(QString tm, quint64 tt, quint64 f, quint64 k)
+void Widget::setLog(const QString tm, const quint64 tt, const quint64 f, const quint64 k)
 {
     if (k > speedRecord) { // максимальная скорость
         speedRecord = k;
-        std::string hs = "Maximum speed: " + std::to_string(speedRecord) + " kH/s";
-        ui->hs->setText(hs.c_str());
+        QString hs = "Maximum speed: " + numToReadbleString(speedRecord) + " kH/s";
+        ui->hs->setText(hs);
     }
-    ui->time->setText(tm);                          // время
-    ui->total->setText(std::to_string(tt).c_str()); // общий счетчик
-    ui->found->setText(std::to_string(f).c_str());  // колесо фартуны
-    ui->khs->setText(std::to_string(k).c_str());    // скорость
+    ui->time->setText(tm);                      // время
+    ui->found->setText(numToReadbleString(f));  // колесо фартуны
+    ui->khs->setText(numToReadbleString(k));    // скорость
+    ui->total->setText(numToReadbleString(tt)); // общий счетчик
 }
 
-void Widget::setAddr(QString address)
+void Widget::setAddr(const QString address)
 {
     ui->last->setText(address);
 }
@@ -73,6 +73,16 @@ void Widget::setAddr(QString address)
 Widget::~Widget()
 {
     delete ui;
+}
+
+QString Widget::numToReadbleString(const quint64 num)
+{
+    QString string = QString::number(num);
+    for (int i = string.size()-1, counter = 0; i >= 0; --i)
+    {
+        if (++counter % 3 == 0 && i != 0) string.insert(i, ' ');
+    }
+    return string;
 }
 
 void Widget::secondByteEdit(int i)
