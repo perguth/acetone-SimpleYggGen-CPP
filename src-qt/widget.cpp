@@ -59,7 +59,7 @@ void Widget::setLog(const QString tm, const quint64 tt, const quint64 f, const q
         QString hs = "Maximum speed: " + numToReadableString(speedRecord) + " kH/s";
         ui->hs->setText(hs);
     }
-    ui->time->setText(tm);                      // время
+    ui->time->setText(tm);                       // время
     ui->found->setText(numToReadableString(f));  // колесо фартуны
     ui->khs->setText(numToReadableString(k));    // скорость
     ui->total->setText(numToReadableString(tt)); // общий счетчик
