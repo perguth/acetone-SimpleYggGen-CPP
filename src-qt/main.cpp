@@ -1,3 +1,9 @@
+/*
+ * developers of GUI version: acetone, Vort
+ * developers team, 2021 (c) GPLv3
+ *
+ */
+
 #include "widget.h"
 #include "qtdownload.h"
 

@@ -1,9 +1,9 @@
 /*
- * Address miner for Yggdrsail 0.4.x and higher.
- * The main part of the code is taken from the previous generation
- * of the miner for the 0.3.x and earlier Yggdrasil's branch.
+ * Address miner for Yggdrsail Network 0.4.x and higher.
  *
+ * developers: Vort, acetone, R4SAS, lialh4, filarius, orignal
  * developers team, 2021 (c) GPLv3
+ *
  */
 
 #include "main.h"
