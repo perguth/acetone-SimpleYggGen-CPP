@@ -22,7 +22,7 @@ private:
     unsigned int m_mode = 1;
     uint64_t speedRecord = 0;
     bool isStarted = false;
-    QString numToReadbleString(const quint64);
+    QString numToReadableString(const quint64);
 
 public slots:
     void secondByteEdit(int);

@@ -56,13 +56,13 @@ void Widget::setLog(const QString tm, const quint64 tt, const quint64 f, const q
 {
     if (k > speedRecord) { // максимальная скорость
         speedRecord = k;
-        QString hs = "Maximum speed: " + numToReadbleString(speedRecord) + " kH/s";
+        QString hs = "Maximum speed: " + numToReadableString(speedRecord) + " kH/s";
         ui->hs->setText(hs);
     }
     ui->time->setText(tm);                      // время
-    ui->found->setText(numToReadbleString(f));  // колесо фартуны
-    ui->khs->setText(numToReadbleString(k));    // скорость
-    ui->total->setText(numToReadbleString(tt)); // общий счетчик
+    ui->found->setText(numToReadableString(f));  // колесо фартуны
+    ui->khs->setText(numToReadableString(k));    // скорость
+    ui->total->setText(numToReadableString(tt)); // общий счетчик
 }
 
 void Widget::setAddr(const QString address)
@@ -75,7 +75,7 @@ Widget::~Widget()
     delete ui;
 }
 
-QString Widget::numToReadbleString(const quint64 num)
+QString Widget::numToReadableString(const quint64 num)
 {
     QString string = QString::number(num);
     for (int i = string.size()-1, counter = 0; i >= 0; --i)
