@@ -69,7 +69,7 @@ void miner::logStatistics()
     }
 }
 
-void miner::logKeys(Address raw, const KeysBox keys)
+void miner::logKeys(const Address& raw, const KeysBox keys)
 {
     std::string base32 = getBase32(raw);
     if (conf.mode == 5 || conf.mode == 6) emit setAddr(pickupMeshnameForOutput(base32).c_str());
@@ -133,7 +133,7 @@ std::string miner::pickupMeshnameForOutput(std::string str)
     return str + ".meshname";
 }
 
-std::string miner::keyToString(const Key key)
+std::string miner::keyToString(const Key& key)
 {
     return hexArrayToString(key.data(), KEYSIZE);
 }
@@ -183,7 +183,7 @@ void miner::getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr)
         rawAddr[i + 2] = InvertedPublicKey[i+start];
 }
 
-Key miner::bitwiseInverse(const Key key)
+Key miner::bitwiseInverse(const Key& key)
 {
     Key inverted;
     for(size_t i = 0; i < key.size(); ++i)
@@ -192,7 +192,7 @@ Key miner::bitwiseInverse(const Key key)
     return inverted;
 }
 
-int miner::getOnes(const Key value)
+int miner::getOnes(const Key& value)
 {
     const int zeroBytesMap[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
     int leadOnes = 0; // кол-во лидирующих единиц

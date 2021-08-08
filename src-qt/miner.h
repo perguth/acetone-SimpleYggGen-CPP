@@ -50,17 +50,17 @@ private:
 
     void testOutput();
     void logStatistics();
-    void logKeys(Address raw, const KeysBox keys);
+    void logKeys(const Address& raw, const KeysBox keys);
     std::string getBase32(const Address& rawAddr);
     std::string pickupStringForMeshname(std::string str);
     std::string pickupMeshnameForOutput(std::string str);
-    std::string keyToString(const Key key);
+    std::string keyToString(const Key& key);
     std::string hexArrayToString(const uint8_t* bytes, int length);
     std::string getAddress(const Address& rawAddr);
     KeysBox getKeyPair();
     void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr);
-    Key bitwiseInverse(const Key key);
-    int getOnes(const Key value);
+    Key bitwiseInverse(const Key& key);
+    int getOnes(const Key& value);
     void process_fortune_key(const KeysBox& keys);
     void miner_thread();
 
