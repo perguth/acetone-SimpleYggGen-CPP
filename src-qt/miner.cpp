@@ -95,7 +95,7 @@ std::string miner::getBase32(const Address& rawAddr)
 
 /**
  * pickupStringForMeshname получает человекочитаемую строку
- * типа fsdasdaklasdgdas.meshname и возвращает значение, пригодное
+ * типа fsdasdaklasdgdas.meship и возвращает значение, пригодное
  * для поиска по meshname-строке: удаляет возможную доменную зону
  * (всё после точки и саму точку), а также делает все буквы
  * заглавными.
@@ -122,7 +122,7 @@ std::string miner::pickupStringForMeshname(std::string str)
  * pickupMeshnameForOutput получает сырое base32 значение
  * типа KLASJFHASSA7979====== и возвращает meshname-домен:
  * делает все символы строчными и удаляет паддинги ('='),
- * а также добавляет доменную зону ".meshname".
+ * а также добавляет доменную зону ".meship".
  */
 std::string miner::pickupMeshnameForOutput(std::string str)
 {
@@ -130,7 +130,7 @@ std::string miner::pickupMeshnameForOutput(std::string str)
         *it = tolower(*it);
     for (auto it = str.end(); *(it-1) == '='; it--)
         str.pop_back(); // удаляем символы '=' в конце адреса
-    return str + ".meshname";
+    return str + ".meship";
 }
 
 std::string miner::keyToString(const Key& key)
