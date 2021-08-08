@@ -1,7 +1,7 @@
 ### SimpleYggGen-CPP [![Download SimpleYggGen-CPP](https://img.shields.io/sourceforge/dt/simpleygggen.svg)](https://sourceforge.net/projects/simpleygggen/files/latest/download)
 ```
 ILITA IRC:
-Yggdrasil    324:9de3:fea4:f6ac::41    6667
+Yggdrasil    324:71e:281a:9ed3::41    6667
 General channels: #howtoygg and #ru
 ```
 
