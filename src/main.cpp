@@ -140,7 +140,7 @@ void logStatistics()
     }
 }
 
-void logKeys(Address raw, const KeysBox keys)
+void logKeys(const Address& raw, const KeysBox& keys)
 {
     mtx.lock();
     if(newline) // добавляем пустую строку на экране между счетчиком и новым адресом
@@ -226,7 +226,7 @@ std::string pickupMeshnameForOutput(std::string str)
  * decodeMeshToIP получает строковое значение сырого base32
  * кода типа KLASJFHASSA7979====== и возвращает IPv6-стринг.
  */
-std::string decodeMeshToIP(const std::string str)
+std::string decodeMeshToIP(const std::string& str)
 {
     std::string mesh = pickupStringForMeshname(str) + "======"; // 6 паддингов - норма для IPv6 адреса
     std::vector<uint8_t> raw = cppcodec::base32_rfc4648::decode(mesh);
@@ -246,7 +246,7 @@ bool subnetCheck() // замена 300::/64 на целевой 200::/7
     return false;
 }
 
-bool convertStrToRaw(const std::string str, Address& array)
+bool convertStrToRaw(const std::string& str, Address& array)
 {
     return inet_pton(AF_INET6, str.c_str(), (void*)array.data());
 }
@@ -281,7 +281,7 @@ void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr)
         rawAddr[i + 2] = InvertedPublicKey[i+start];
 }
 
-Key bitwiseInverse(const Key key)
+Key bitwiseInverse(const Key& key)
 {
     Key inverted;
     for(size_t i = 0; i < key.size(); ++i)
@@ -290,7 +290,7 @@ Key bitwiseInverse(const Key key)
     return inverted;
 }
 
-int getOnes(const Key value)
+int getOnes(const Key& value)
 {
     const int zeroBytesMap[8] = {0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01};
     int leadOnes = 0; // кол-во лидирующих единиц
@@ -321,7 +321,7 @@ std::string hexArrayToString(const uint8_t* bytes, int length)
     return ss.str();
 }
 
-std::string keyToString(const Key key)
+std::string keyToString(const Key& key)
 {
     return hexArrayToString(key.data(), KEYSIZE);
 }

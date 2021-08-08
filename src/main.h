@@ -33,20 +33,20 @@ struct KeysBox
 void displayConfig();
 void testOutput();
 void logStatistics();
-void logKeys(uint8_t * raw, const Key publicKey, const Key privateKey);
+void logKeys(const Address& raw, const KeysBox& keys);
 std::string getBase32(const Address& rawAddr);
 std::string pickupStringForMeshname(std::string str);
 std::string pickupMeshnameForOutput(std::string str);
-std::string decodeMeshToIP(const std::string str);
+std::string decodeMeshToIP(const std::string& str);
 bool subnetCheck();
-bool convertStrToRaw(const std::string str, Address& array);
+bool convertStrToRaw(const std::string& str, Address& array);
 KeysBox getKeyPair();
 void getRawAddress(int lErase, Key InvertedPublicKey, Address& rawAddr);
-Key bitwiseInverse(const Key key);
-int getOnes(const Key value);
+Key bitwiseInverse(const Key& key);
+int getOnes(const Key& value);
 std::string getAddress(const Address& rawAddr);
 std::string hexArrayToString(const uint8_t* bytes, int length);
-std::string keyToString(const Key key);
+std::string keyToString(const Key& key);
 void process_fortune_key(const KeysBox& block);
 void startThreads();
 template <int T>
