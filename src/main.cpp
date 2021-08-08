@@ -184,7 +184,7 @@ std::string getBase32(const Address& rawAddr)
 
 /**
  * pickupStringForMeshname получает человекочитаемую строку
- * типа fsdasdaklasdgdas.meshname и возвращает значение, пригодное
+ * типа fsdasdaklasdgdas.meship и возвращает значение, пригодное
  * для поиска по meshname-строке: удаляет возможную доменную зону
  * (всё после точки и саму точку), а также делает все буквы
  * заглавными.
@@ -211,7 +211,7 @@ std::string pickupStringForMeshname(std::string str)
  * pickupMeshnameForOutput получает сырое base32 значение
  * типа KLASJFHASSA7979====== и возвращает meshname-домен:
  * делает все символы строчными и удаляет паддинги ('='),
- * а также добавляет доменную зону ".meshname".
+ * а также добавляет доменную зону ".meship".
  */
 std::string pickupMeshnameForOutput(std::string str)
 {
@@ -219,7 +219,7 @@ std::string pickupMeshnameForOutput(std::string str)
         *it = tolower(*it);
     for (auto it = str.end(); *(it-1) == '='; it--)
         str.pop_back(); // удаляем символы '=' в конце адреса
-    return str + ".meshname";
+    return str + ".meship";
 }
 
 /**
@@ -518,7 +518,7 @@ void help()
    Convert Meshname to IP                                --toip | -ti <value>\n\
  [Notes]                                                                     \n\
    Meshname domains use base32 (RFC4648) alphabet symbols.                   \n\
-   In meshname domain mining should use \"=\" instead \".meshname\".         \n\
+   In meshname domain mining should use \"=\" instead \".meship\" or \".meshname\".\n\
    Subnet brute force mode understand \"3xx:\" and \"2xx:\" patterns.        \n\
  +--------------------------------------------------------------------------+\n";
 }
